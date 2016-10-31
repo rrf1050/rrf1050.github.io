@@ -38,7 +38,7 @@ phina.globalize();
 // 定数
 var ASSETS = {
   image: {
-    bg: "http://jsrun.it/assets/a/G/5/Y/aG5YD.png",
+    bg: "https://rawgit.com/rrf1050/test/master/haikei.png",
    maki0: 'https://cdn.rawgit.com/rrf1050/test/master/makiss-0.png',
     maki1: 'https://cdn.rawgit.com/rrf1050/test/master/makiss-1.png',
     maki2: 'https://cdn.rawgit.com/rrf1050/test/master/makiss-2.png',
@@ -75,6 +75,7 @@ var ASSETS = {
 	  hantei21: 'https://rawgit.com/rrf1050/test/master/hantei/walkbegin/walkbeginhantei.txt.json',
 	  hantei22: 'https://rawgit.com/rrf1050/test/master/hantei/standup/standuphantei.txt.json',
 	  hantei23: 'https://rawgit.com/rrf1050/test/master/hantei/sitdown/sitdownhantei.txt.json',
+	  hantei24: 'https://rawgit.com/rrf1050/test/master/hantei/jdamage_keep/jdamage_keephantei.txt.json',
 	}
 };
 var SCREEN_WIDTH  = 960;              // スクリーン幅
@@ -164,7 +165,9 @@ phina.define("GameObject",{
     }
     statusupdate(this);//アニメーション完了による状態変更を適用
     
-    if(this.status!=="jump"&&this.status!=="jslash"&&this.status!=="dash"&&this.status!=="slash"&&this.status!=="jrslash"){
+    if(this.status!=="damage"&&this.status!=="jdamage"&&this.status!=="sdamage"&&this.status!=="counterdamage"
+    &&this.status!=="jump"&&this.status!=="jslash"&&this.status!=="dash"&&this.status!=="slash"
+    &&this.status!=="jrslash"&&!this.df3_l&&!this.df3_r){
       if(this.object.x < this.target.object.x)
         this.direction="right";
       else
@@ -172,7 +175,8 @@ phina.define("GameObject",{
     }
     if(this.status==="jump"&&this.pre_status==="jslash"&&!this.s_shiftflag){
       this.s_shiftflag=true;
-      this.object_ss.currentFrameIndex=this.counter_hold-1;
+      this.object_ss.currentFrameIndex=this.counter_hold;
+      statusupdate(this);
     }
     if(this.status==="idol"&&this.pre_status==="jump"){
       this.jslash_count=0;
@@ -181,7 +185,38 @@ phina.define("GameObject",{
       this.object_ss.gotoAndPlay("winpose");
       statusupdate(this);
     }
-    
+    if(this.status == "jdamage_keep"&&this.pre_status=="jdamage"&&!this.s_shiftflag){
+      this.s_shiftflag=true;
+      this.hitflag=false;
+      this.sousai=false;
+      var tmp = this.counter_hold;
+      if(tmp -1 < 10){
+        tmp=10+10-(tmp-1)+1;
+      }
+      //console.log(tmp);
+      this.object_ss.currentFrameIndex=tmp;
+      statusupdate(this);
+    }
+    if(this.status==="idol"&&this.pre_status==="damage"){
+      this.hitflag=false;
+      this.sousai=false;
+    }
+    if(this.status==="idol"&&this.pre_status==="slash"){
+      this.hitflag=false;
+      this.sousai=false;
+    }
+    if(this.status==="idol"&&this.pre_status==="sslash"){
+      this.hitflag=false;
+      this.sousai=false;
+    }
+    if(this.status==="idol"&&this.pre_status==="jslash"){
+      this.hitflag=false;
+      this.sousai=false;
+    }
+    if(this.status==="idol"&&this.pre_status==="jrslash"){
+      this.hitflag=false;
+      this.sousai=false;
+    }
     
     //入力
     if(this.inputable){
@@ -209,7 +244,6 @@ phina.define("GameObject",{
             }
           }
         }
-        
         if(ps[0]!=null){
           if(!this.fingerswitchflag){
             this.now=ps[0].now;
@@ -289,6 +323,9 @@ phina.define("GameObject",{
         this.input.down=keyboard.getKey("down");
         this.input.a=keyboard.getKey("z");
       }
+    }
+    else{
+      this.input.up=true;
     }
     //入力から状態を決定
     if(!this.input.left){
@@ -563,7 +600,38 @@ phina.define("GameObject",{
         this.object.x -= SPEED*3;
       }
     }
-    
+    if(this.status==="jdamage"){
+      if(this.direction=="right"){
+        this.object.x -= SPEED*3;
+      }
+      else{
+        this.object.x += SPEED*3;
+      }
+    }
+    if(this.status==="jdamage_keep"){
+      if(this.direction=="right"){
+        this.object.x -= SPEED*3;
+      }
+      else{
+        this.object.x += SPEED*3;
+      }
+      JUMP_Y = 2.5*Math.pow(this.frame-9.5,2)-106;
+      JUMP_DY = JUMP_Y-(2.5*Math.pow(this.frame-1-9.5,2)-106);
+      this.object.y += JUMP_DY;
+      if(this.object.y>=0){
+        this.object.y=0;
+        this.object_ss.gotoAndPlay("shirimochi");
+        statusupdate(this);
+      }
+    }
+    if(this.status==="shirimochi"){
+      if(this.direction=="right"){
+        this.object.x -= SPEED*3;
+      }
+      else{
+        this.object.x += SPEED*3;
+      }
+    }
     if(this.direction=="right"){
       this.object.scaleX=-1;
     }
@@ -605,7 +673,7 @@ phina.define("GameObject",{
       case 'idol':
         i=6;
         break;
-      case 'jdamag':
+      case 'jdamage':
         i=7;
         break;
       case 'jrslash':
@@ -655,6 +723,9 @@ phina.define("GameObject",{
         break;
       case 'sitdown':
         i=23;
+        break;
+      case 'jdamage_keep':
+        i=24;
         break;
       default:
         i=5;
@@ -711,6 +782,7 @@ phina.define("GameObject",{
     }
     if(this.status==="jump"||this.status==="jslash"){
       if(this.status==="jump"){
+        this.s_shiftflag=false;
         this.counter_hold=this.frame;
       }
       this.object_ss.gotoAndPlay("jdamage");
@@ -732,7 +804,7 @@ phina.define("GameObject",{
       this.object_ss.gotoAndPlay("damage");
       statusupdate(this);
     }
-    //console.log("check");
+  //console.log("check");
   }
 });
 /*
@@ -749,8 +821,13 @@ phina.define("MainScene", {
 
     // 背景
     this.bg = Sprite("bg").addChildTo(this);
+    this.bg1 = Sprite("bg").addChildTo(this);
+    this.bg2 = Sprite("bg").addChildTo(this);
     this.bg.origin.set(0, 0); // 左上基準に変更
-
+    this.bg1.origin.set(0,0);
+    this.bg2.origin.set(0,0);
+    this.bg1.x=-SCREEN_WIDTH;
+    this.bg2.x=+SCREEN_WIDTH;
     // プレイヤー
     this.player = GameObject(['maki0','maki1','maki2','maki3','maki4','maki5','maki6'],'maki_ss',this,-300,0,false);
     this.enemy = GameObject(['maki0','maki1','maki2','maki3','maki4','maki5','maki6'],'maki_ss',this,300,0,true);
@@ -760,7 +837,7 @@ phina.define("MainScene", {
     
     this.hanteilist = [];
     var _hanteis = ["hantei0","hantei1","hantei2","hantei3","hantei4","hantei5","hantei6","hantei7","hantei8","hantei9","hantei10","hantei11","hantei12","hantei13","hantei14","hantei15","hantei16","hantei17","hantei18","hantei19"
-    ,"hantei20","hantei21","hantei22","hantei23"
+    ,"hantei20","hantei21","hantei22","hantei23","hantei24"
     ];
     (_hanteis.length).times(function(i){
       var tmp = phina.asset.AssetManager.get("json",_hanteis[i]);
@@ -773,6 +850,7 @@ phina.define("MainScene", {
     this.karaburiflag1_e=false;
     this.karaburiflag2_e=false;
     //this.test = phina.asset.AssetManager.get("json","test");
+    //console.log(this.hanteilist[7][6]);
   },
   
   // 更新
@@ -783,8 +861,54 @@ phina.define("MainScene", {
       }
       else return false;
     }
+    var bgs = [];
+    bgs.push(this.bg);
+    bgs.push(this.bg1);
+    bgs.push(this.bg2);
+    var gos = [];
+    gos.push(this.player);
+    gos.push(this.enemy);
     this.player.update(app.pointer,app.pointers,app.keyboard);
-    this.enemy.update()
+    this.enemy.update();
+    
+    (gos.length).times(function(i){
+      if(gos[i].object.x<-430){
+        var tmp=0;
+        tmp = -430-gos[i].object.x;
+        gos[i].object.x=-430;
+        (bgs.length).times(function(j){
+          bgs[j].x+=tmp;
+          if(bgs[j].x>SCREEN_WIDTH){
+            var tmp2 = bgs[j].x;
+            bgs[j].x = tmp2 - SCREEN_WIDTH*3;
+          }
+        },this);
+        gos[i].target.object.x+=tmp;
+        if(gos[i].target.object.x>430){
+          gos[i].target.object.x=430;
+        }
+      }
+      if(gos[i].object.x>430){
+        var tmp=0;
+        tmp = 430-gos[i].object.x;
+        gos[i].object.x=430;
+        (bgs.length).times(function(j){
+          bgs[j].x+=tmp;
+          if(bgs[j].x<-SCREEN_WIDTH){
+            var tmp2 = bgs[j].x;
+            bgs[j].x = tmp2 + SCREEN_WIDTH*3;
+          }
+        },this);
+        gos[i].target.object.x+=tmp;
+        if(gos[i].target.object.x<-430){
+          gos[i].target.object.x=-430;
+        }
+      }
+    },this);
+    
+    
+    
+    
     this.hanteipool = [];
     this.player.updatehantei(this.hanteilist,this.hanteipool);
     this.enemy.updatehantei(this.hanteilist,this.hanteipool);
@@ -812,10 +936,11 @@ phina.define("MainScene", {
                   this.enemy.hitpoint--;
                   //HPreduce
                 }
-              }
-              //soundSE1
+                //soundSE1
               this.enemy.damage();
               this.player.hitflag=true;
+              }
+              
             }
           }
         },this);
@@ -841,10 +966,11 @@ phina.define("MainScene", {
                   this.player.hitpoint--;
                   //HPreduce
                 }
-              }
-              //soundSE1
+                //soundSE1
               this.player.damage();
               this.enemy.hitflag=true;
+              }
+              
             }
           }
         },this);
@@ -888,7 +1014,7 @@ phina.define("MainScene", {
       this.karaburiflag2_p=true;
     if(this.karaburiflag1_e)
       this.karaburiflag2_e=true;
-    //console.log(this.player.direction);
+    //console.log(this.player.frame,this.player.status);
   }
 });
 
