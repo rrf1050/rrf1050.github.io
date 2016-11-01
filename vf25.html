@@ -104,7 +104,7 @@ var ASSETS = {
 };
 var FOUR = 1;
 if(!phina.isMobile()){
-  FOUR=1;
+  FOUR=4;
 }
 var SCREEN_WIDTH  = 960/FOUR;              // スクリーン幅
 var SCREEN_HEIGHT = 540/FOUR;              // スクリーン高さ
@@ -1112,30 +1112,30 @@ phina.define("MainScene", {
     this.superInit(options);
 
     // 背景
-    //if(phina.isMobile()){
-    //this.bg = Sprite("bg25").addChildTo(this);
-    //this.bg1 = Sprite("bg25").addChildTo(this);
-    //this.bg2 = Sprite("bg25").addChildTo(this);
-    //}
-    //else{
+    if(phina.isMobile()){
+    this.bg = Sprite("bg25").addChildTo(this);
+    this.bg1 = Sprite("bg25").addChildTo(this);
+    this.bg2 = Sprite("bg25").addChildTo(this);
+    }
+    else{
     this.bg = Sprite("bg").addChildTo(this);
     this.bg1 = Sprite("bg").addChildTo(this);
     this.bg2 = Sprite("bg").addChildTo(this);
-    //}
+    }
     this.bg.origin.set(0, 0); // 左上基準に変更
     this.bg1.origin.set(0,0);
     this.bg2.origin.set(0,0);
     this.bg1.x=-SCREEN_WIDTH;
     this.bg2.x=+SCREEN_WIDTH;
     // プレイヤー
-    //if(!phina.isMobile()){
+    if(!phina.isMobile()){
       this.player = GameObject(['maki0','maki1','maki2','maki3','maki4','maki5','maki6'],'maki_ss',this,-300,0,false);
       this.enemy = GameObject(['yukari0','yukari1','yukari2','yukari3','yukari4','yukari5'],'yukari_ss',this,300,0,true);
-    //}
-    //else{
-    //  this.player = GameObject(['maki25'],'maki25_ss',this,-300/FOUR,0,false);
-    //  this.enemy = GameObject(['yukari25'],'yukari25_ss',this,300/FOUR,0,true);
-    //}
+    }
+    else{
+      this.player = GameObject(['maki25'],'maki25_ss',this,-300/FOUR,0,false);
+      this.enemy = GameObject(['yukari25'],'yukari25_ss',this,300/FOUR,0,true);
+    }
     this.player.object.scaleX=-1;
     
     this.player.target=this.enemy;
