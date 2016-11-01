@@ -324,7 +324,7 @@ phina.define("GameObject",{
         if (this.now) {
           var diff_x = this.x_tmp - p.x;
           var diff_y = this.y_tmp - p.y;
-          if (Math.abs(diff_x) > SPEED*10) {
+          if (Math.abs(diff_x) > SPEED*5/FOUR) {
             if (diff_x < 0) {
               this.input.right=true;
             }
@@ -332,17 +332,17 @@ phina.define("GameObject",{
               this.input.left=true;
             }
           }
-          if(diff_y > SPEED*10){
+          if(diff_y > SPEED*5/FOUR){
             this.input.up=true;
           }
-          if(diff_y < -SPEED*10){
+          if(diff_y < -SPEED*5/FOUR){
             this.input.down=true;
           }
-          if(Math.abs(diff_x)<=SPEED*10){
+          if(Math.abs(diff_x)<=SPEED*5/FOUR){
             this.input.right=false;
             this.input.left=false;
           }
-          if(Math.abs(diff_y)<=SPEED*10){
+          if(Math.abs(diff_y)<=SPEED*5/FOUR){
             this.input.up=false;
             this.input.down=false;
           }
