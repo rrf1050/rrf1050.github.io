@@ -57,13 +57,16 @@ var ASSETS = {
     maki_test0: 'https://rawgit.com/rrf1050/test/master/graphic/maki_test-0.png',
     maki_test1: 'https://rawgit.com/rrf1050/test/master/graphic/maki_test-1.png',
     maki_test2: 'https://rawgit.com/rrf1050/test/master/graphic/maki_test-2.png',
+    maki_test:  'https://rawgit.com/rrf1050/test/master/graphic/maki_test.png',
+    yukari: 'https://rawgit.com/rrf1050/test/master/graphic/yukari_all.png',
   },
 	spritesheet: {
 		'maki_ss': 'https://rawgit.com/rrf1050/test/master/ss/maki.ss',
-		'yukari_ss': 'https://rawgit.com/rrf1050/test/master/ss/yukari.ss',
+		'yukari_ss': 'https://rawgit.com/rrf1050/test/master/ss/yukari_all.json',
 		"maki25_ss": "https://rawgit.com/rrf1050/test/master/ss/maki_25.json",
 		"yukari25_ss": "https://rawgit.com/rrf1050/test/master/ss/yukari_25.json",
 		"maki_test_ss": 'https://rawgit.com/rrf1050/test/master/ss/maki_test.json',
+		"maki_test_ss2": 'https://rawgit.com/rrf1050/test/master/ss/maki_test2.json',
 	},
 	json: {
 	  hantei0: 'https://rawgit.com/rrf1050/test/master/hantei/backstep/backstephantei.txt.json',
@@ -1130,8 +1133,9 @@ phina.define("MainScene", {
     // プレイヤー
     if(SWITCH||!phina.isMobile()){
       //this.player = GameObject(['maki0','maki1','maki2','maki3','maki4','maki5','maki6'],'maki_ss',this,-300,0,false);
-      this.player = GameObject(['maki_test0','maki_test1','maki_test2'],'maki_test_ss',this,-300,0,false);
-      this.enemy = GameObject(['yukari0','yukari1','yukari2','yukari3','yukari4','yukari5'],'yukari_ss',this,300,0,true);
+      this.player = GameObject(['maki_test'],'maki_test_ss2',this,-300/FOUR,0,false);
+      //this.enemy = GameObject(['yukari0','yukari1','yukari2','yukari3','yukari4','yukari5'],'yukari_ss',this,300,0,true);
+      this.enemy = GameObject(['yukari'],'yukari_ss',this,300/FOUR,0,true);
     }
     else{
       this.player = GameObject(['maki25'],'maki25_ss',this,-300/FOUR,0,false);
