@@ -30,16 +30,15 @@ h1 {
   <body>
     <script src="https://rawgit.com/rrf1050/test/master/build/phina.js"></script>
     <script>
-
+//console.log(Math.pow(2,0.5));
 // グローバルに展開
 phina.globalize();
-
 // 定数
 var ASSETS = {
   image: {
     bg: "https://rawgit.com/rrf1050/test/master/graphic/haikei.png",
     bg25: "https://rawgit.com/rrf1050/test/master/graphic/haikei25.png",
-   maki0: 'https://rawgit.com/rrf1050/test/master/graphic/makiss-0.png',
+   /*maki0: 'https://rawgit.com/rrf1050/test/master/graphic/makiss-0.png',
     maki1: 'https://rawgit.com/rrf1050/test/master/graphic/makiss-1.png',
     maki2: 'https://rawgit.com/rrf1050/test/master/graphic/makiss-2.png',
     maki3: 'https://rawgit.com/rrf1050/test/master/graphic/makiss-3.png',
@@ -56,9 +55,13 @@ var ASSETS = {
     yukari25: 'https://rawgit.com/rrf1050/test/master/graphic/yukari_25.png',
     maki_test0: 'https://rawgit.com/rrf1050/test/master/graphic/maki_test-0.png',
     maki_test1: 'https://rawgit.com/rrf1050/test/master/graphic/maki_test-1.png',
-    maki_test2: 'https://rawgit.com/rrf1050/test/master/graphic/maki_test-2.png',
+    maki_test2: 'https://rawgit.com/rrf1050/test/master/graphic/maki_test-2.png',*/
     maki_test:  'https://rawgit.com/rrf1050/test/master/graphic/maki_test.png',
     yukari: 'https://rawgit.com/rrf1050/test/master/graphic/yukari_all.png',
+    maki_test_rc:  'https://rawgit.com/rrf1050/test/master/graphic/maki_rc_.png',
+    yukari_rc: 'https://rawgit.com/rrf1050/test/master/graphic/yukari_rc_.png',
+    maki_75: "https://rawgit.com/rrf1050/test/master/graphic/maki_75.png",
+    yukari_75: 'https://rawgit.com/rrf1050/test/master/graphic/yukari_75.png',
   },
 	spritesheet: {
 		'maki_ss': 'https://rawgit.com/rrf1050/test/master/ss/maki.ss',
@@ -67,6 +70,8 @@ var ASSETS = {
 		"yukari25_ss": "https://rawgit.com/rrf1050/test/master/ss/yukari_25.json",
 		"maki_test_ss": 'https://rawgit.com/rrf1050/test/master/ss/maki_test.json',
 		"maki_test_ss2": 'https://rawgit.com/rrf1050/test/master/ss/maki_test2.json',
+		"maki75_ss": "https://rawgit.com/rrf1050/test/master/ss/maki_75.json",
+		"yukari75_ss": "https://rawgit.com/rrf1050/test/master/ss/yukari_75.json",
 	},
 	json: {
 	  hantei0: 'https://rawgit.com/rrf1050/test/master/hantei/backstep/backstephantei.txt.json',
@@ -109,8 +114,8 @@ var ASSETS = {
 	  todome: 'https://rawgit.com/rrf1050/test/master/se/todome.wav',
 	}
 };
-var SWITCH =true;
-var FOUR = 4;
+var SWITCH =false;
+var FOUR = 4/3;
 if(SWITCH||!phina.isMobile()){
   FOUR=1;
 }
@@ -1136,15 +1141,20 @@ phina.define("MainScene", {
       this.player = GameObject(['maki_test'],'maki_test_ss2',this,-300/FOUR,0,false);
       //this.enemy = GameObject(['yukari0','yukari1','yukari2','yukari3','yukari4','yukari5'],'yukari_ss',this,300,0,true);
       this.enemy = GameObject(['yukari'],'yukari_ss',this,300/FOUR,0,true);
+      //this.player2 = GameObject(['maki_test_rc'],'maki_test_ss2',this,-300/FOUR,0,true);
+      //this.enemy = GameObject(['yukari0','yukari1','yukari2','yukari3','yukari4','yukari5'],'yukari_ss',this,300,0,true);
+      //this.enemy2 = GameObject(['yukari_rc'],'yukari_ss',this,300/FOUR,0,true);
     }
     else{
-      this.player = GameObject(['maki25'],'maki25_ss',this,-300/FOUR,0,false);
-      this.enemy = GameObject(['yukari25'],'yukari25_ss',this,300/FOUR,0,true);
+      this.player = GameObject(['maki_75'],'maki75_ss',this,-300/FOUR,0,false);
+      this.enemy = GameObject(['yukari_75'],'yukari75_ss',this,300/FOUR,0,true);
     }
     this.player.object.scaleX=-1;
     
     this.player.target=this.enemy;
     this.enemy.target=this.player;
+    //this.player2.target=this.enemy2;
+    //this.enemy2.target=this.player2;
     
     this.hanteilist = [];
     var _hanteis = ["hantei0","hantei1","hantei2","hantei3","hantei4","hantei5","hantei6","hantei7","hantei8","hantei9","hantei10","hantei11","hantei12","hantei13","hantei14","hantei15","hantei16","hantei17","hantei18","hantei19"
@@ -1161,7 +1171,7 @@ phina.define("MainScene", {
     this.karaburiflag1_e=false;
     this.karaburiflag2_e=false;
     //this.test = phina.asset.AssetManager.get("json","test");
-    //console.log(this.hanteilist[7][6]);
+    
     this.cancelSE = AssetManager.get("sound","cancel");
     this.chitSE = AssetManager.get("sound","chit");
     this.cursorSE = AssetManager.get("sound","cursor");
@@ -1175,6 +1185,7 @@ phina.define("MainScene", {
     this.todomeSE = AssetManager.get("sound","todome");
     
     //this.enemy.mode="standby";
+   //console.memory();
   },
   
   // 更新
@@ -1194,6 +1205,8 @@ phina.define("MainScene", {
     gos.push(this.enemy);
     this.player.update(app.pointer,app.pointers,app.keyboard);
     this.enemy.update();
+    //this.player2.update();
+    //this.enemy2.update();
     
     (gos.length).times(function(i){
       if(gos[i].object.x<-430/FOUR){
@@ -1338,6 +1351,7 @@ phina.define("MainScene", {
     if(this.karaburiflag1_e)
       this.karaburiflag2_e=true;
     //console.log(this.enemy.mode,this.enemy.sitcounter,this.enemy.sit,this.enemy.input.down);
+     //console.log(app.canvas.miterLimit);
   }
 });
 
@@ -1352,9 +1366,9 @@ phina.main(function() {
     height: SCREEN_HEIGHT,// 画面高さ
     assets: ASSETS,       // アセット読み込み
   });
-
+  
   app.enableStats();
-
+  
   // 実行
   app.run();
 });
