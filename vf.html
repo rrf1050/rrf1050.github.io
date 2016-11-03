@@ -62,6 +62,7 @@ var ASSETS = {
     yukari_rc: 'https://rawgit.com/rrf1050/test/master/graphic/yukari_rc_.png',
     maki_75: "https://rawgit.com/rrf1050/test/master/graphic/maki_75.png",
     yukari_75: 'https://rawgit.com/rrf1050/test/master/graphic/yukari_75.png',
+    maki_and_yukari: 'https://rawgit.com/rrf1050/test/master/graphic/maki_and_yukari.png',
   },
 	spritesheet: {
 		'maki_ss': 'https://rawgit.com/rrf1050/test/master/ss/maki.ss',
@@ -1138,9 +1139,9 @@ phina.define("MainScene", {
     // プレイヤー
     if(SWITCH||!phina.isMobile()){
       //this.player = GameObject(['maki0','maki1','maki2','maki3','maki4','maki5','maki6'],'maki_ss',this,-300,0,false);
-      this.player = GameObject(['maki_test'],'maki_test_ss2',this,-300/FOUR,0,false);
+      this.player = GameObject(['maki_and_yukari'],'yukari_ss',this,-300/FOUR,0,false);
       //this.enemy = GameObject(['yukari0','yukari1','yukari2','yukari3','yukari4','yukari5'],'yukari_ss',this,300,0,true);
-      this.enemy = GameObject(['yukari'],'yukari_ss',this,300/FOUR,0,true);
+      this.enemy = GameObject(['maki_and_yukari'],'yukari_ss',this,300/FOUR,0,true);
       //this.player2 = GameObject(['maki_test_rc'],'maki_test_ss2',this,-300/FOUR,0,true);
       //this.enemy = GameObject(['yukari0','yukari1','yukari2','yukari3','yukari4','yukari5'],'yukari_ss',this,300,0,true);
       //this.enemy2 = GameObject(['yukari_rc'],'yukari_ss',this,300/FOUR,0,true);
