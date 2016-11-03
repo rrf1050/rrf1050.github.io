@@ -1127,15 +1127,15 @@ phina.define("MainScene", {
     this.bg2 = Sprite("bg25").addChildTo(this);
     }
     else{
-    this.bg = Sprite("bg").addChildTo(this);
-    this.bg1 = Sprite("bg").addChildTo(this);
-    this.bg2 = Sprite("bg").addChildTo(this);
+    //this.bg = Sprite("bg").addChildTo(this);
+    //this.bg1 = Sprite("bg").addChildTo(this);
+    //this.bg2 = Sprite("bg").addChildTo(this);
     }
-    this.bg.origin.set(0, 0); // 左上基準に変更
-    this.bg1.origin.set(0,0);
-    this.bg2.origin.set(0,0);
-    this.bg1.x=-SCREEN_WIDTH;
-    this.bg2.x=+SCREEN_WIDTH;
+    //this.bg.origin.set(0, 0); // 左上基準に変更
+    //this.bg1.origin.set(0,0);
+    //this.bg2.origin.set(0,0);
+    //this.bg1.x=-SCREEN_WIDTH;
+    //this.bg2.x=+SCREEN_WIDTH;
     // プレイヤー
     if(SWITCH||!phina.isMobile()){
       //this.player = GameObject(['maki0','maki1','maki2','maki3','maki4','maki5','maki6'],'maki_ss',this,-300,0,false);
@@ -1198,9 +1198,9 @@ phina.define("MainScene", {
       else return false;
     }
     var bgs = [];
-    bgs.push(this.bg);
-    bgs.push(this.bg1);
-    bgs.push(this.bg2);
+    //bgs.push(this.bg);
+    //bgs.push(this.bg1);
+    //bgs.push(this.bg2);
     var gos = [];
     gos.push(this.player);
     gos.push(this.enemy);
