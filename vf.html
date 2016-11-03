@@ -1207,6 +1207,8 @@ phina.define("MainScene", {
     this.enemy.update();
     //this.player2.update();
     //this.enemy2.update();
+
+		this.enemy.object_ss.currentFrameIndex=0;
     
     (gos.length).times(function(i){
       if(gos[i].object.x<-430/FOUR){
