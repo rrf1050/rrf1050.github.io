@@ -1,0 +1,287 @@
+<!doctype html>
+ 
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    
+    <title>2016/11/04 13:14:10 - Runstant</title>
+    <meta name="description" content="思いたったらすぐ開発. プログラミングに革命を..." />
+    
+    <style>*, *:before, *:after {
+  box-sizing: border-box; 
+}
+#target {
+	width: 200px ;
+	height: 200px ;
+	background: #f2f2f2 ;
+	margin: 0 auto ;
+	display: block ;
+}
+html {
+  font-size: 13px;
+}
+body {
+  font-family: Avenir, "Open Sans", "Helvetica Neue", Helvetica, Arial, Verdana, Roboto, "游ゴシック", "Yu Gothic", "游ゴシック体", "YuGothic", "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "Meiryo UI", "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+  color: #444;
+  background-color: hsl(0, 0%, 96%);
+}
+h1 {
+  font-size: 1.8rem;
+}
+
+</style>
+  </head>
+  <body>
+    <h1>2016/11/04 13:14:10 - Runstant</h1>
+    <p>思いたったらすぐ開発. プログラミングに革命を...</p>
+    <input type="file" id="selectfile" name="images[]" accept='image/*' multiple>
+    <canvas id="target"></canvas>
+    <script src='https://rawgit.com/rrf1050/test/master/bin-packing/js/packer.growing.js'></script>
+    <script>/*
+ * Runstant
+ * 思いたったらすぐ開発. プログラミングに革命を...
+ */
+ function ObjArraySort(ary, key, order) {
+    var reverse = 1;
+    if(order && order.toLowerCase() == "desc") 
+        reverse = -1;
+    ary.sort(function(a, b) {
+        if(a[key] < b[key])
+            return -1 * reverse;
+        else if(a[key] == b[key])
+            return 0;
+        else
+            return 1 * reverse;
+    });
+}
+var TrimingImage = function(src,rect,width,height){
+  var minx=Infinity,miny=Infinity,maxx=0,maxy=0;
+  for (var y = 0; y < height; y++) {
+        for (var x = 0; x < width; x++) {
+            var idx = (x + y * width) * 4;
+            var alpha=src[idx+3];
+            if(alpha>0){
+                if(x<minx){
+									minx=x;
+								}
+								if(y<miny){
+									miny=y;
+								}
+								if(maxx<x){
+									maxx=x;
+								}
+								if(maxy<y){
+									maxy=y;
+								}
+            }
+        }
+    }
+    rect.x = minx;
+    rect.y=miny;
+    rect.width=maxx-minx+1;
+    rect.height=maxy-miny+1;
+    //dstData=context.getImageData(minx,miny,maxx-minx+1,maxy-miny+1);
+};
+window.onload = function() {
+  
+  
+    function handleFileSelect(evt) {
+    var files = evt.target.files; // FileList object
+    var LENGTH = files.length;
+    var img = null;
+    var imgs=[];
+    var frames=[];
+    var canvas = document.createElement("canvas");
+    // Loop through the FileList and render image files as thumbnails.
+    for (var i = 0, f; f = files[i]; i++) {
+//console.log("check");
+      // Only process image files.
+      if (!f.type.match('image.*')) {
+        continue;
+      }
+       
+      var reader = new FileReader();
+      
+      // Closure to capture the file information.
+      reader.onload=(function(theFile){
+        //console.log(theFile.name);
+        return function(e){
+          var obj={
+            src: "",
+            name: "",
+          };
+          obj.src = e.target.result;
+          obj.name = theFile.name;
+          imgs.push(obj);
+          //imgs[i].name=theFile.name;
+          if(imgs.length==LENGTH){
+            for(var j = 0,im;im=imgs[j];j++){
+              img = new Image();
+              img.onload=(function(theimage){
+                return function(e){
+                  //console.log(theimage.name,e.target.width);
+                  var context = canvas.getContext('2d');
+                  var width = e.target.width;
+                  var height = e.target.height;
+                  canvas.width = width;
+                  canvas.height = height;
+                  context.drawImage(e.target, 0, 0);
+                  
+                  //フィルター処理
+                  var srcData = context.getImageData(0, 0, width, height);
+                  var src = srcData.data;
+                  var rect={
+                    x: 0,
+                    y: 0,
+                    width: 1,
+                    height: 1,
+                  };
+                  TrimingImage(src,rect,width,height);
+                  var dstData=context.getImageData(rect.x,rect.y,rect.width,rect.height);
+                  //console.log(dstData.width,dstData.height);
+                  var frame={};
+                  frame.name=theimage.name;
+                  frame.x=0;
+                  frame.y=0;
+                  frame.srcx=rect.x;
+                  frame.srcy=rect.y;
+                  frame.w=rect.width;
+                  frame.h=rect.height;
+                  frame.data=dstData;
+                  frames.push(frame);
+                  if(frames.length==LENGTH){
+                    var packer = new GrowingPacker();
+                    frames.sort(function(a,b) { return (b.h - a.h); });
+                    packer.fit(frames);
+                    //console.log(packer);
+                    var canvas2=document.getElementById("target");
+                    canvas2.width=packer.root.w;
+                    canvas2.height=packer.root.h;
+                    var ctx = canvas2.getContext('2d');
+                    
+                    for(var n = 0 ; n < frames.length ; n++) {
+                      var fr = frames[n];
+                      if (fr.fit) {
+                        ctx.putImageData(fr.data,fr.fit.x,fr.fit.y);
+                        fr.x=fr.fit.x;
+                        fr.y=fr.fit.y;
+                        delete fr.data;
+                        delete fr.fit;
+                        //console.log(fr.fit.x, fr.fit.y, fr.w, fr.h);
+                      }
+                    }
+
+                    var dataurl = canvas2.toDataURL();
+                    //document.getElementById("output").innerHTML = "<img src='" + dataurl + "'>";
+                    document.getElementById("dlid").href = dataurl;
+                    
+                    ObjArraySort(frames,"name");
+                    var data = JSON.stringify(frames,null,"  ");
+                    /*var a = document.createElement('a');
+                    a.textContent = 'download SpriteSheet';
+                    a.download = 'spritesheet.json';
+                    a.href = window.URL.createObjectURL(new Blob([data], { type: 'text/plain' }));
+                    a.dataset.downloadurl = ['text/plain', a.download, a.href].join(':');
+                    
+                    var exportLink = document.getElementById('export-link');
+                    exportLink.appendChild(a);*/
+                    document.getElementById("dlid2").href = window.URL.createObjectURL(new Blob([data], { type: 'text/plain' }));
+                  }
+                };
+              })(im);
+              img.src=im.src;
+            }
+          }
+          
+        };
+      })(f);
+      reader.readAsDataURL(f);
+    }
+  }
+
+  document.getElementById('selectfile').addEventListener('change', handleFileSelect, false);
+  
+  // TODO: write code
+  // console.log("Hello, runstant!");
+  //ファイルオープンの際のイベント
+  /*
+  var ofd = document.getElementById("selectfile");
+  ofd.addEventListener("change", function(evt) {
+    //ここに画像データを入力
+    var img = null;
+    var canvas = document.createElement("canvas");
+    var files = evt.target.files;
+    var readers =[];
+    for (var i = 0, f; f = files[i]; i++) {
+    reader = new FileReader();
+    //console.log(files[0].name);
+    //dataURL形式でファイルを読み込む
+   
+   
+      
+ 
+    //ファイルの読込が終了した時の処理
+    reader.onload = function(){
+     console.log("Check");
+      //console.log(thefile.name);
+        img = new Image();
+        img.onload = function(){
+                 
+                //読み込み終了後ここで画像を加工して表示する
+                var context = canvas.getContext('2d');
+                var width = img.width;
+                var height = img.height;
+                canvas.width = width;
+                canvas.height = height;
+                context.drawImage(img, 0, 0);
+                
+                //フィルター処理
+                var srcData = context.getImageData(0, 0, width, height);
+                var dstData = context.createImageData(width, height);
+                var src = srcData.data;
+                var dst = dstData.data;
+                //grayFilter(src, dst, width, height);
+                //sobelFilter(src, dst, width, height);
+                context.putImageData(srcData, 0, 0);
+ 
+                //画像タグに代入して表示
+                var dataurl = canvas.toDataURL();
+                document.getElementById("output").innerHTML = "<img src='" + dataurl + "'>";
+        }
+        //読み込んだ画像ソースを入れる
+        //img.src = thefile.result;
+        img.src=reader.result;
+        //console.log(reader.result);
+    }
+    reader.readAsDataURL(f);
+    }
+  }, false);
+  
+  */
+  /*
+  var packer = new GrowingPacker();   // or:  new GrowingPacker();
+  var blocks = [
+    { w: 100, h: 100 },
+    { w: 100, h: 100 },
+    { w:  80, h:  80 },
+    { w:  80, h:  80 },
+  ];
+
+  blocks.sort(function(a,b) { return (b.h - a.h); }); // sort inputs for best results
+  packer.fit(blocks);
+  //console.log(packer);
+  for(var n = 0 ; n < blocks.length ; n++) {
+    var block = blocks[n];
+    if (block.fit) {
+      console.log(block.fit.x, block.fit.y, block.w, block.h);
+    }
+  }*/
+};
+</script>
+    <a download='packingImage.png' id='dlid'>download Image</a>
+    <a download='SpriteSheet.json' id='dlid2'>download SpriteSheet</a>
+  </body>
+</html>
+

@@ -63,6 +63,9 @@ var ASSETS = {
     maki_75: "https://rawgit.com/rrf1050/test/master/graphic/maki_75.png",
     yukari_75: 'https://rawgit.com/rrf1050/test/master/graphic/yukari_75.png',
     maki_and_yukari: 'https://rawgit.com/rrf1050/test/master/graphic/maki_and_yukari.png',
+    maki_and_yukari2: 'https://rawgit.com/rrf1050/test/master/graphic/maki_and_yukari_copy.png',
+    maki_and_yukari3: 'https://rawgit.com/rrf1050/test/master/graphic/maki_and_yukari_copy2.png',
+    maki_and_yukari4: 'https://rawgit.com/rrf1050/test/master/graphic/maki_and_yukari_copy3.png',
   },
 	spritesheet: {
 		'maki_ss': 'https://rawgit.com/rrf1050/test/master/ss/maki.ss',
@@ -1141,10 +1144,10 @@ phina.define("MainScene", {
       //this.player = GameObject(['maki0','maki1','maki2','maki3','maki4','maki5','maki6'],'maki_ss',this,-300,0,false);
       this.player = GameObject(['maki_and_yukari'],'yukari_ss',this,-300/FOUR,0,false);
       //this.enemy = GameObject(['yukari0','yukari1','yukari2','yukari3','yukari4','yukari5'],'yukari_ss',this,300,0,true);
-      this.enemy = GameObject(['maki_and_yukari'],'yukari_ss',this,300/FOUR,0,true);
-      //this.player2 = GameObject(['maki_test_rc'],'maki_test_ss2',this,-300/FOUR,0,true);
+      this.enemy = GameObject(['maki_and_yukari2'],'yukari_ss',this,300/FOUR,0,true);
+      this.player2 = GameObject(['maki_and_yukari3'],'yukari_ss',this,-300/FOUR,0,true);
       //this.enemy = GameObject(['yukari0','yukari1','yukari2','yukari3','yukari4','yukari5'],'yukari_ss',this,300,0,true);
-      //this.enemy2 = GameObject(['yukari_rc'],'yukari_ss',this,300/FOUR,0,true);
+      this.enemy2 = GameObject(['maki_and_yukari4'],'yukari_ss',this,300/FOUR,0,true);
     }
     else{
       this.player = GameObject(['maki_75'],'maki75_ss',this,-300/FOUR,0,false);
@@ -1154,8 +1157,8 @@ phina.define("MainScene", {
     
     this.player.target=this.enemy;
     this.enemy.target=this.player;
-    //this.player2.target=this.enemy2;
-    //this.enemy2.target=this.player2;
+    this.player2.target=this.enemy2;
+    this.enemy2.target=this.player2;
     
     this.hanteilist = [];
     var _hanteis = ["hantei0","hantei1","hantei2","hantei3","hantei4","hantei5","hantei6","hantei7","hantei8","hantei9","hantei10","hantei11","hantei12","hantei13","hantei14","hantei15","hantei16","hantei17","hantei18","hantei19"
