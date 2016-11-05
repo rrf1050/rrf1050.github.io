@@ -202,8 +202,8 @@ window.onload = function() {
                   frames.push(frame);
                   if(frames.length==LENGTH){
                     var packer = new GrowingPacker();
-                    frames.sort(function(a,b) { return (b.h < a.h); });
-                    //Sort.now(frames,"w");
+                    //frames.sort(function(a,b) { return (b.h < a.h); });
+                    Sort.now(frames,"a");
                     packer.fit(frames);
                     console.log(packer.root.w,packer.root.h);
                     var canvas2=document.getElementById("target");
