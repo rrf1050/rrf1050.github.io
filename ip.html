@@ -43,6 +43,36 @@ h1 {
  * Runstant
  * 思いたったらすぐ開発. プログラミングに革命を...
  */
+ var Sort= {
+
+    random  : function (a,b) { return Math.random() - 0.5; },
+    w       : function (a,b) { return b.w - a.w; },
+    h       : function (a,b) { return b.h - a.h; },
+    a       : function (a,b) { return b.area - a.area; },
+    max     : function (a,b) { return Math.max(b.w, b.h) - Math.max(a.w, a.h); },
+    min     : function (a,b) { return Math.min(b.w, b.h) - Math.min(a.w, a.h); },
+
+    height  : function (a,b) { return Sort.msort(a, b, ['h', 'w']);               },
+    width   : function (a,b) { return Sort.msort(a, b, ['w', 'h']);               },
+    area    : function (a,b) { return Sort.msort(a, b, ['a', 'h', 'w']);          },
+    maxside : function (a,b) { return Sort.msort(a, b, ['max', 'min', 'h', 'w']); },
+
+    msort: function(a, b, criteria) { /* sort by multiple criteria */
+      var diff, n;
+      for (n = 0 ; n < criteria.length ; n++) {
+        diff = Sort[criteria[n]](a,b);
+        if (diff != 0)
+          return diff;  
+      }
+      return 0;
+    },
+
+    now: function(blocks,string) {
+      var sort = string;
+      if (sort != 'none')
+        blocks.sort(Sort[sort]);
+    }
+  };
  function ObjArraySort(ary, key, order) {
     var reverse = 1;
     if(order && order.toLowerCase() == "desc") 
@@ -55,6 +85,25 @@ h1 {
         else
             return 1 * reverse;
     });
+}
+function dataURItoBlob(dataURI) {
+    // convert base64/URLEncoded data component to raw binary data held in a string
+    var byteString;
+    if (dataURI.split(',')[0].indexOf('base64') >= 0)
+        byteString = atob(dataURI.split(',')[1]);
+    else
+        byteString = unescape(dataURI.split(',')[1]);
+
+    // separate out the mime component
+    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+    // write the bytes of the string to a typed array
+    var ia = new Uint8Array(byteString.length);
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+
+    return new Blob([ia], {type:mimeString});
 }
 var TrimingImage = function(src,rect,width,height){
   var minx=Infinity,miny=Infinity,maxx=0,maxy=0;
@@ -153,9 +202,10 @@ window.onload = function() {
                   frames.push(frame);
                   if(frames.length==LENGTH){
                     var packer = new GrowingPacker();
-                    frames.sort(function(a,b) { return (b.h - a.h); });
+                    frames.sort(function(a,b) { return (b.h < a.h); });
+                    //Sort.now(frames,"w");
                     packer.fit(frames);
-                    //console.log(packer);
+                    console.log(packer.root.w,packer.root.h);
                     var canvas2=document.getElementById("target");
                     canvas2.width=packer.root.w;
                     canvas2.height=packer.root.h;
@@ -173,20 +223,14 @@ window.onload = function() {
                       }
                     }
 
-                    var dataurl = canvas2.toDataURL();
+                    //var dataurl = canvas2.toDataURL();
+                    //var blob = dataURItoBlob(dataurl);
+                    //delete dataurl;
                     //document.getElementById("output").innerHTML = "<img src='" + dataurl + "'>";
-                    document.getElementById("dlid").href = dataurl;
+                    //document.getElementById("dlid").href = window.URL.createObjectURL(blob);
                     
                     ObjArraySort(frames,"name");
                     var data = JSON.stringify(frames,null,"  ");
-                    /*var a = document.createElement('a');
-                    a.textContent = 'download SpriteSheet';
-                    a.download = 'spritesheet.json';
-                    a.href = window.URL.createObjectURL(new Blob([data], { type: 'text/plain' }));
-                    a.dataset.downloadurl = ['text/plain', a.download, a.href].join(':');
-                    
-                    var exportLink = document.getElementById('export-link');
-                    exportLink.appendChild(a);*/
                     document.getElementById("dlid2").href = window.URL.createObjectURL(new Blob([data], { type: 'text/plain' }));
                   }
                 };
@@ -202,82 +246,7 @@ window.onload = function() {
   }
 
   document.getElementById('selectfile').addEventListener('change', handleFileSelect, false);
-  
-  // TODO: write code
-  // console.log("Hello, runstant!");
-  //ファイルオープンの際のイベント
-  /*
-  var ofd = document.getElementById("selectfile");
-  ofd.addEventListener("change", function(evt) {
-    //ここに画像データを入力
-    var img = null;
-    var canvas = document.createElement("canvas");
-    var files = evt.target.files;
-    var readers =[];
-    for (var i = 0, f; f = files[i]; i++) {
-    reader = new FileReader();
-    //console.log(files[0].name);
-    //dataURL形式でファイルを読み込む
-   
-   
-      
- 
-    //ファイルの読込が終了した時の処理
-    reader.onload = function(){
-     console.log("Check");
-      //console.log(thefile.name);
-        img = new Image();
-        img.onload = function(){
-                 
-                //読み込み終了後ここで画像を加工して表示する
-                var context = canvas.getContext('2d');
-                var width = img.width;
-                var height = img.height;
-                canvas.width = width;
-                canvas.height = height;
-                context.drawImage(img, 0, 0);
-                
-                //フィルター処理
-                var srcData = context.getImageData(0, 0, width, height);
-                var dstData = context.createImageData(width, height);
-                var src = srcData.data;
-                var dst = dstData.data;
-                //grayFilter(src, dst, width, height);
-                //sobelFilter(src, dst, width, height);
-                context.putImageData(srcData, 0, 0);
- 
-                //画像タグに代入して表示
-                var dataurl = canvas.toDataURL();
-                document.getElementById("output").innerHTML = "<img src='" + dataurl + "'>";
-        }
-        //読み込んだ画像ソースを入れる
-        //img.src = thefile.result;
-        img.src=reader.result;
-        //console.log(reader.result);
-    }
-    reader.readAsDataURL(f);
-    }
-  }, false);
-  
-  */
-  /*
-  var packer = new GrowingPacker();   // or:  new GrowingPacker();
-  var blocks = [
-    { w: 100, h: 100 },
-    { w: 100, h: 100 },
-    { w:  80, h:  80 },
-    { w:  80, h:  80 },
-  ];
 
-  blocks.sort(function(a,b) { return (b.h - a.h); }); // sort inputs for best results
-  packer.fit(blocks);
-  //console.log(packer);
-  for(var n = 0 ; n < blocks.length ; n++) {
-    var block = blocks[n];
-    if (block.fit) {
-      console.log(block.fit.x, block.fit.y, block.w, block.h);
-    }
-  }*/
 };
 </script>
     <a download='packingImage.png' id='dlid'>download Image</a>
