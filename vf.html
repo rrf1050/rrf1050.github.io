@@ -14,6 +14,14 @@ http://rrfgames.sitemix.jp/vf.html
     <style>*, *:before, *:after {
   box-sizing: border-box; 
 }
+canvas{
+  image-rendering: -moz-crisp-edges;         /* Firefox */
+  image-rendering:   -o-crisp-edges;         /* Opera */
+  image-rendering: -webkit-optimize-contrast;/* Webkit (非標準の名前) */
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;  /* IE (非標準プロパティ) */
+  image-rendering: pixelated;
+}
 html {
   font-size: 62.5%;
 }
@@ -25,7 +33,7 @@ h1 {
   font-size: 1.8rem;
 }
 
-</style>
+  </style>
   </head>
   <body>
     <script src="https://rawgit.com/rrf1050/test/master/build/phina.js"></script>
@@ -34,6 +42,9 @@ h1 {
 // グローバルに展開
 phina.globalize();
 // 定数
+
+var SWITCH =false;
+if(SWITCH||!phina.isMobile()){
 var ASSETS = {
   image: {
     bg: "https://rawgit.com/rrf1050/test/master/graphic/haikei.png",
@@ -55,14 +66,17 @@ var ASSETS = {
     yukari25: 'https://rawgit.com/rrf1050/test/master/graphic/yukari_25.png',
     maki_test0: 'https://rawgit.com/rrf1050/test/master/graphic/maki_test-0.png',
     maki_test1: 'https://rawgit.com/rrf1050/test/master/graphic/maki_test-1.png',
-    maki_test2: 'https://rawgit.com/rrf1050/test/master/graphic/maki_test-2.png',*/
+    maki_test2: 'https://rawgit.com/rrf1050/test/master/graphic/maki_test-2.png',
     maki_test:  'https://rawgit.com/rrf1050/test/master/graphic/maki_test.png',
-    yukari: 'https://rawgit.com/rrf1050/test/master/graphic/yukari.png',
-    maki: 'https://rawgit.com/rrf1050/test/master/graphic/maki.png',
+    
     maki_test_rc:  'https://rawgit.com/rrf1050/test/master/graphic/maki_rc_.png',
     yukari_rc: 'https://rawgit.com/rrf1050/test/master/graphic/yukari_rc_.png',
-    maki_75: "https://rawgit.com/rrf1050/test/master/graphic/maki_75.png",
-    yukari_75: 'https://rawgit.com/rrf1050/test/master/graphic/yukari_75.png',
+    maki_25: "https://rawgit.com/rrf1050/test/master/graphic/maki_25.png",*/
+    yukari_25: 'https://rawgit.com/rrf1050/test/master/graphic/yukari_25.png',
+    yukari: 'https://rawgit.com/rrf1050/test/master/graphic/yukari.png',
+    maki: 'https://rawgit.com/rrf1050/test/master/graphic/maki.png',
+    tune:'https://rawgit.com/rrf1050/test/master/graphic/tune.png',
+    yukari_4bit: "https://rawgit.com/rrf1050/test/master/graphic/yukari25_c16_4bit.png",
   },
 	spritesheet: {
 		'maki_ss': 'https://rawgit.com/rrf1050/test/master/ss/maki.json',
@@ -73,6 +87,8 @@ var ASSETS = {
 		"maki_test_ss2": 'https://rawgit.com/rrf1050/test/master/ss/maki_test2.json',
 		"maki75_ss": "https://rawgit.com/rrf1050/test/master/ss/maki_75.json",
 		"yukari75_ss": "https://rawgit.com/rrf1050/test/master/ss/yukari_75.json",
+		"tune_ss": "https://rawgit.com/rrf1050/test/master/ss/tune_ss.json",
+		"yukari_4bit_ss":"https://rawgit.com/rrf1050/test/master/ss/yukari25_c16.json",
 	},
 	json: {
 	  hantei0: 'https://rawgit.com/rrf1050/test/master/hantei/backstep/backstephantei.txt.json',
@@ -115,10 +131,69 @@ var ASSETS = {
 	  todome: 'https://rawgit.com/rrf1050/test/master/se/todome.wav',
 	}
 };
-var SWITCH =true;
-var FOUR = 4/3;
+}
+else{
+  var ASSETS = {
+  image: {
+    bg25: "https://rawgit.com/rrf1050/test/master/graphic/haikei25.png",
+    maki_25: "https://rawgit.com/rrf1050/test/master/graphic/maki_25.png",
+    yukari_25: 'https://rawgit.com/rrf1050/test/master/graphic/yukari_25.png',
+    yukari_25_d50: 'https://rawgit.com/rrf1050/test/master/graphic/yukari25_d50.png',
+    yukari_25_d100: 'https://rawgit.com/rrf1050/test/master/graphic/yukari25_d100.png',
+    yukari_4bit: "https://rawgit.com/rrf1050/test/master/graphic/yukari25_c16_4bit.png",
+  },
+	spritesheet: {
+		"maki25_ss": "https://rawgit.com/rrf1050/test/master/ss/maki_25.json",
+		"yukari25_ss": "https://rawgit.com/rrf1050/test/master/ss/yukari_25.json",
+		"yukari25_d50_ss": "https://rawgit.com/rrf1050/test/master/ss/yukari_25_d50.json",
+		"yukari25_d100_ss": "https://rawgit.com/rrf1050/test/master/ss/yukari_25_d100.json",
+		"yukari_4bit_ss":"https://rawgit.com/rrf1050/test/master/ss/yukari25_c16.json",
+	},
+	json: {
+	  hantei0: 'https://rawgit.com/rrf1050/test/master/hantei/backstep/backstephantei.txt.json',
+	  hantei1: 'https://rawgit.com/rrf1050/test/master/hantei/backwalk/backwalkhantei.txt.json',
+	  hantei2: 'https://rawgit.com/rrf1050/test/master/hantei/counterdamage/counterdamagehantei.txt.json',
+	  hantei3: 'https://rawgit.com/rrf1050/test/master/hantei/damage/damagehantei.txt.json',
+	  hantei4: 'https://rawgit.com/rrf1050/test/master/hantei/dash/dashhantei.txt.json',
+	  hantei5: 'https://rawgit.com/rrf1050/test/master/hantei/down/downhantei.txt.json',
+	  hantei6: 'https://rawgit.com/rrf1050/test/master/hantei/idol/idolhantei.txt.json',
+	  hantei7: 'https://rawgit.com/rrf1050/test/master/hantei/jdamage/jdamagehantei.txt.json',
+	  hantei8: 'https://rawgit.com/rrf1050/test/master/hantei/jrslash/jrslashhantei.txt.json',
+	  hantei9: 'https://rawgit.com/rrf1050/test/master/hantei/jslash/jslashhantei.txt.json',
+	  hantei10: 'https://rawgit.com/rrf1050/test/master/hantei/jump/jumphantei.txt.json',
+	  hantei11: 'https://rawgit.com/rrf1050/test/master/hantei/sdamage/sdamagehantei.txt.json',
+	  hantei12: 'https://rawgit.com/rrf1050/test/master/hantei/shirimochi/shirimochihantei.txt.json',
+	  hantei13: 'https://rawgit.com/rrf1050/test/master/hantei/sit/sithantei.txt.json',
+	  hantei14: 'https://rawgit.com/rrf1050/test/master/hantei/slash1/slashhantei.txt.json',
+	  hantei15: 'https://rawgit.com/rrf1050/test/master/hantei/sslash/sslashhantei.txt.json',
+	  hantei16: 'https://rawgit.com/rrf1050/test/master/hantei/wakeup/wakeuphantei.txt.json',
+	  hantei17: 'https://rawgit.com/rrf1050/test/master/hantei/walk/walkhantei.txt.json',
+	  hantei18: 'https://rawgit.com/rrf1050/test/master/hantei/winpose/winposehantei.txt.json',
+	  hantei19: 'https://rawgit.com/rrf1050/test/master/hantei/wintoidol/wintoidolhantei.txt.json',
+	  hantei20: 'https://rawgit.com/rrf1050/test/master/hantei/backwalkbegin/backwalkbeginhantei.txt.json',
+	  hantei21: 'https://rawgit.com/rrf1050/test/master/hantei/walkbegin/walkbeginhantei.txt.json',
+	  hantei22: 'https://rawgit.com/rrf1050/test/master/hantei/standup/standuphantei.txt.json',
+	  hantei23: 'https://rawgit.com/rrf1050/test/master/hantei/sitdown/sitdownhantei.txt.json',
+	  hantei24: 'https://rawgit.com/rrf1050/test/master/hantei/jdamage_keep/jdamage_keephantei.txt.json',
+	},
+	sound: {
+	  cancel: 'https://rawgit.com/rrf1050/test/master/se/cancel.wav',
+	  chit: 'https://rawgit.com/rrf1050/test/master/se/chit.wav',
+	  cursor: 'https://rawgit.com/rrf1050/test/master/se/cursor.wav',
+	  enter: 'https://rawgit.com/rrf1050/test/master/se/enter.wav',
+	  fight: 'https://rawgit.com/rrf1050/test/master/se/fight.wav',
+	  jhit: 'https://rawgit.com/rrf1050/test/master/se/jhit.wav',
+	  karaburi: 'https://rawgit.com/rrf1050/test/master/se/karaburi.wav',
+	  sousai: 'https://rawgit.com/rrf1050/test/master/se/metal.wav',
+	  ready: 'https://rawgit.com/rrf1050/test/master/se/ready.wav',
+	  slash: 'https://rawgit.com/rrf1050/test/master/se/slash.wav',
+	  todome: 'https://rawgit.com/rrf1050/test/master/se/todome.wav',
+	}
+};
+}
+var FOUR = 4;
 if(SWITCH||!phina.isMobile()){
-  FOUR=1;
+  FOUR=4;
 }
 var SCREEN_WIDTH  = 960/FOUR;              // スクリーン幅
 var SCREEN_HEIGHT = 540/FOUR;              // スクリーン高さ
@@ -208,7 +283,7 @@ phina.define("GameObject",{
     }*/
     
   },
-  update: function(pointer,pointers,keyboard){
+  update: function(pointer,pointers,keyboard,owner){
     
     
     
@@ -362,6 +437,7 @@ phina.define("GameObject",{
         this.input.up=keyboard.getKey("up");
         this.input.down=keyboard.getKey("down");
         this.input.a=keyboard.getKey("z");
+        
       }
       if(this.input.left&&this.input.right){
         this.input.left=false;
@@ -596,6 +672,20 @@ phina.define("GameObject",{
         }
       }
     }
+    if(keyboard.getKey("space")){
+      var tmpx=this.object.x,tmpy=this.object.y;
+      this.object_ss.remove();
+      this.object.remove();
+      this.object=Sprite("maki").addChildTo(owner);
+      this.object.setPosition(tmpx,tmpy);
+      this.object.origin.set(0,0);
+      this.object.frameIndex=0;
+      this.object_ss = FrameAnimation("maki_ss");
+      this.object_ss.attachTo(this.object);
+      this.object_ss.gotoAndPlay(this.status);
+      this.currentFrameIndex=this.frame;
+    }
+    
     //入力から状態を決定
     if(!this.input.left){
       if(this.df3_l)
@@ -913,11 +1003,15 @@ phina.define("GameObject",{
       }
     }
     if(this.direction=="right"){
-      this.object.scaleX=-1;
+      this.object.reverse=true;
     }
     else{
-      this.object.scaleX=1;
+      this.object.reverse=false;
     }
+    
+    //this.object.x = Math.floor(this.object.x);
+    //this.object.y = Math.floor(this.object.y);
+    
     
     if(this.df1_l)
       this.counter_df1_l++;
@@ -1120,16 +1214,17 @@ phina.define("MainScene", {
     // super init
     this.superInit(options);
 
+    
     // 背景
     if(!SWITCH&&phina.isMobile()){
-    this.bg = Sprite("bg25").addChildTo(this);
-    this.bg1 = Sprite("bg25").addChildTo(this);
-    this.bg2 = Sprite("bg25").addChildTo(this);
+      this.bg = Sprite("bg25").addChildTo(this);
+      this.bg1 = Sprite("bg25").addChildTo(this);
+      this.bg2 = Sprite("bg25").addChildTo(this);
     }
     else{
-    this.bg = Sprite("bg").addChildTo(this);
-    this.bg1 = Sprite("bg").addChildTo(this);
-    this.bg2 = Sprite("bg").addChildTo(this);
+      this.bg = Sprite("bg25").addChildTo(this);
+      this.bg1 = Sprite("bg25").addChildTo(this);
+      this.bg2 = Sprite("bg25").addChildTo(this);
     }
     this.bg.origin.set(0, 0); // 左上基準に変更
     this.bg1.origin.set(0,0);
@@ -1139,18 +1234,18 @@ phina.define("MainScene", {
     // プレイヤー
     if(SWITCH||!phina.isMobile()){
       //this.player = GameObject(['maki0','maki1','maki2','maki3','maki4','maki5','maki6'],'maki_ss',this,-300,0,false);
-      this.player = GameObject(['maki'],'maki_ss',this,-300/FOUR,0,false);
+      this.player = GameObject(['yukari_4bit'],'yukari_4bit_ss',this,-300/FOUR,0,false);
       //this.enemy = GameObject(['yukari0','yukari1','yukari2','yukari3','yukari4','yukari5'],'yukari_ss',this,300,0,true);
-      this.enemy = GameObject(['yukari'],'yukari_ss',this,300/FOUR,0,true);
+      this.enemy = GameObject(['yukari_25'],'yukari25_ss',this,300/FOUR,0,true);
       //this.player2 = GameObject(['maki_test_rc'],'maki_test_ss2',this,-300/FOUR,0,true);
       //this.enemy = GameObject(['yukari0','yukari1','yukari2','yukari3','yukari4','yukari5'],'yukari_ss',this,300,0,true);
       //this.enemy2 = GameObject(['yukari_rc'],'yukari_ss',this,300/FOUR,0,true);
     }
     else{
-      this.player = GameObject(['maki_75'],'maki75_ss',this,-300/FOUR,0,false);
-      this.enemy = GameObject(['yukari_75'],'yukari75_ss',this,300/FOUR,0,true);
+      this.player = GameObject(['yukari_25'],'yukari25_ss',this,-300/FOUR,0,false);
+      this.enemy = GameObject(['yukari_25'],'yukari25_ss',this,300/FOUR,0,true);
     }
-    this.player.object.scaleX=-1;
+    this.player.object.reverse=true;
     
     this.player.target=this.enemy;
     this.enemy.target=this.player;
@@ -1204,11 +1299,10 @@ phina.define("MainScene", {
     var gos = [];
     gos.push(this.player);
     gos.push(this.enemy);
-    this.player.update(app.pointer,app.pointers,app.keyboard);
-    this.enemy.update();
+    this.player.update(app.pointer,app.pointers,app.keyboard,this);
+    this.enemy.update(app.pointer,app.pointers,app.keyboard,this);
     //this.player2.update();
     //this.enemy2.update();
-    
     (gos.length).times(function(i){
       if(gos[i].object.x<-430/FOUR){
         var tmp=0;
@@ -1367,7 +1461,7 @@ phina.main(function() {
     height: SCREEN_HEIGHT,// 画面高さ
     assets: ASSETS,       // アセット読み込み
   });
-  
+  app.canvas.imageSmoothingEnabled=false;
   app.enableStats();
   
   // 実行
