@@ -77,6 +77,7 @@ var ASSETS = {
     maki: 'https://rawgit.com/rrf1050/test/master/graphic/maki.png',
     tune:'https://rawgit.com/rrf1050/test/master/graphic/tune.png',
     yukari_4bit: "https://rawgit.com/rrf1050/test/master/graphic/yukari25_c16_4bit.png",
+    yukari_6bit: "https://rawgit.com/rrf1050/test/master/graphic/yukari25_master_master_6bit_origin.png",
   },
 	spritesheet: {
 		'maki_ss': 'https://rawgit.com/rrf1050/test/master/ss/maki.json',
@@ -89,6 +90,7 @@ var ASSETS = {
 		"yukari75_ss": "https://rawgit.com/rrf1050/test/master/ss/yukari_75.json",
 		"tune_ss": "https://rawgit.com/rrf1050/test/master/ss/tune_ss.json",
 		"yukari_4bit_ss":"https://rawgit.com/rrf1050/test/master/ss/yukari25_c16.json",
+		"yukari_6bit_ss":"https://rawgit.com/rrf1050/test/master/ss/yukari25_master.json",
 	},
 	json: {
 	  hantei0: 'https://rawgit.com/rrf1050/test/master/hantei/backstep/backstephantei.txt.json',
@@ -138,9 +140,8 @@ else{
     bg25: "https://rawgit.com/rrf1050/test/master/graphic/haikei25.png",
     maki_25: "https://rawgit.com/rrf1050/test/master/graphic/maki_25.png",
     yukari_25: 'https://rawgit.com/rrf1050/test/master/graphic/yukari_25.png',
-    yukari_25_d50: 'https://rawgit.com/rrf1050/test/master/graphic/yukari25_d50.png',
-    yukari_25_d100: 'https://rawgit.com/rrf1050/test/master/graphic/yukari25_d100.png',
     yukari_4bit: "https://rawgit.com/rrf1050/test/master/graphic/yukari25_c16_4bit.png",
+    yukari_6bit: "https://rawgit.com/rrf1050/test/master/graphic/yukari25_master_master_6bit_origin.png",
   },
 	spritesheet: {
 		"maki25_ss": "https://rawgit.com/rrf1050/test/master/ss/maki_25.json",
@@ -148,6 +149,7 @@ else{
 		"yukari25_d50_ss": "https://rawgit.com/rrf1050/test/master/ss/yukari_25_d50.json",
 		"yukari25_d100_ss": "https://rawgit.com/rrf1050/test/master/ss/yukari_25_d100.json",
 		"yukari_4bit_ss":"https://rawgit.com/rrf1050/test/master/ss/yukari25_c16.json",
+		"yukari_6bit_ss":"https://rawgit.com/rrf1050/test/master/ss/yukari25_master.json",
 	},
 	json: {
 	  hantei0: 'https://rawgit.com/rrf1050/test/master/hantei/backstep/backstephantei.txt.json',
@@ -1234,15 +1236,15 @@ phina.define("MainScene", {
     // プレイヤー
     if(SWITCH||!phina.isMobile()){
       //this.player = GameObject(['maki0','maki1','maki2','maki3','maki4','maki5','maki6'],'maki_ss',this,-300,0,false);
-      this.player = GameObject(['yukari_4bit'],'yukari_4bit_ss',this,-300/FOUR,0,false);
+      this.player = GameObject(['yukari_6bit'],'yukari_6bit_ss',this,-300/FOUR,0,false);
       //this.enemy = GameObject(['yukari0','yukari1','yukari2','yukari3','yukari4','yukari5'],'yukari_ss',this,300,0,true);
-      this.enemy = GameObject(['yukari_25'],'yukari25_ss',this,300/FOUR,0,true);
+      this.enemy = GameObject(['yukari_4bit'],'yukari_4bit_ss',this,300/FOUR,0,true);
       //this.player2 = GameObject(['maki_test_rc'],'maki_test_ss2',this,-300/FOUR,0,true);
       //this.enemy = GameObject(['yukari0','yukari1','yukari2','yukari3','yukari4','yukari5'],'yukari_ss',this,300,0,true);
       //this.enemy2 = GameObject(['yukari_rc'],'yukari_ss',this,300/FOUR,0,true);
     }
     else{
-      this.player = GameObject(['yukari_4bit'],'yukari_4bit_ss',this,-300/FOUR,0,false);
+      this.player = GameObject(['yukari_6bit'],'yukari_6bit_ss',this,-300/FOUR,0,false);
       this.enemy = GameObject(['yukari_4bit'],'yukari_4bit_ss',this,300/FOUR,0,true);
     }
     this.player.object.reverse=true;
