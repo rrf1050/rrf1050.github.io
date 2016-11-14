@@ -6,18 +6,19 @@
     <meta name="viewport" content="width=device-width, user-scalable=no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     
-    <title>2016/11/04 13:14:10 - Runstant</title>
-    <meta name="description" content="思いたったらすぐ開発. プログラミングに革命を..." />
+    <title>imagepacker</title>
+    <!--<meta name="description" content="某スプライトシート作成アプリのトライアル期間が過ぎたため、javascriptで作成。
+複数の画像を一括トリミングし、一枚の画像にパッキングします。
+画像の座標データ等はspritesheet.jsonテキストファイルに出力。
+
+注意：入力画像が多すぎるとブラウザのメモリ不足によりクラッシュします。
+画面右下のDLマークからhtmlファイルをダウンロードし、起動引数でキャッシュメモリを増やしたブラウザによってローカルのhtmlファイルから実行することである程度カバーできます。
+
+追記:パッキングにbin packing問題用のアルゴリズムを使用。
+しかし本家のBasicアルゴリズムのほうがより良い解を出している。" /> -->
     
     <style>*, *:before, *:after {
   box-sizing: border-box; 
-}
-#target {
-	width: 200px ;
-	height: 200px ;
-	background: #f2f2f2 ;
-	margin: 0 auto ;
-	display: block ;
 }
 html {
   font-size: 13px;
@@ -34,15 +35,32 @@ h1 {
 </style>
   </head>
   <body>
-    <h1>2016/11/04 13:14:10 - Runstant</h1>
-    <p>思いたったらすぐ開発. プログラミングに革命を...</p>
+    <h1>imagepacker</h1>
+    <!--<p>某スプライトシート作成アプリのトライアル期間が過ぎたため、javascriptで作成。
+複数の画像を一括トリミングし、一枚の画像にパッキングします。
+画像の座標データ等はspritesheet.jsonテキストファイルに出力。
+
+注意：入力画像が多すぎるとブラウザのメモリ不足によりクラッシュします。
+画面右下のDLマークからhtmlファイルをダウンロードし、起動引数でキャッシュメモリを増やしたブラウザによってローカルのhtmlファイルから実行することである程度カバーできます。
+
+追記:パッキングにbin packing問題用のアルゴリズムを使用。
+しかし本家のBasicアルゴリズムのほうがより良い解を出している。</p>-->
+    <input type="number" id="input_width" name="input_width" value="1000" min="500">
     <input type="file" id="selectfile" name="images[]" accept='image/*' multiple>
-    <canvas id="target"></canvas>
     <script src='https://rawgit.com/rrf1050/test/master/bin-packing/js/packer.growing.js'></script>
+    <script src='https://rawgit.com/rrf1050/test/master/bin-packing/js/packer.js'></script>
     <script>/*
  * Runstant
  * 思いたったらすぐ開発. プログラミングに革命を...
  */
+ 
+ var INPUT_WIDTH;
+(function() {  
+        var input_width = document.getElementById('input_width'),  
+            value;  
+        INPUT_WIDTH = input_width.valueAsNumber;  
+        console.log(INPUT_WIDTH);  
+      })();  
  var Sort= {
 
     random  : function (a,b) { return Math.random() - 0.5; },
@@ -134,9 +152,17 @@ var TrimingImage = function(src,rect,width,height){
     //dstData=context.getImageData(minx,miny,maxx-minx+1,maxy-miny+1);
 };
 window.onload = function() {
-  
+   
   
     function handleFileSelect(evt) {
+      (function() {  
+        var input_width = document.getElementById('input_width'),  
+            value;  
+        INPUT_WIDTH = input_width.valueAsNumber;  
+        console.log(INPUT_WIDTH);  
+      })();  
+      
+      
     var files = evt.target.files; // FileList object
     var LENGTH = files.length;
     var img = null;
@@ -202,35 +228,98 @@ window.onload = function() {
                   frames.push(frame);
                   if(frames.length==LENGTH){
                     var packer = new GrowingPacker();
-                    //frames.sort(function(a,b) { return (b.h < a.h); });
-                    Sort.now(frames,"a");
-                    packer.fit(frames);
-                    console.log(packer.root.w,packer.root.h);
-                    var canvas2=document.getElementById("target");
-                    canvas2.width=packer.root.w;
-                    canvas2.height=packer.root.h;
+                    
+                    //frames.sort(function(a,b) { return (b.h - a.h); });
+                    frames.sort(function(a,b) { return (a.h - b.h); });
+                    var array=[];
+                    var minsize=Infinity,tmpwi=0,tmpw2=0,tmph2=0;
+                    for(var wi=INPUT_WIDTH-500;wi<INPUT_WIDTH+500;wi++){
+                      array[wi]=[];
+                      for(var k=0;k<frames.length;k++){
+                        array[wi][k]={
+                          x: 0,
+                          y: 0,
+                          w: frames[k].w,
+                          h: frames[k].h
+                        };
+                      }
+                    }
+                    console.log(array[500]);
+                    for(var wi=INPUT_WIDTH-500;wi<INPUT_WIDTH+500;wi++){
+                      var tmpw=0;
+                      var maxhs=[],tmph=0,left=[],right=[];
+                      var rowindex=0;
+                      var maxw=0,maxh=0;
+                      left.push(0);
+                      //right.push(0);
+                      maxhs.push(0);
+                      for(var k=0;k<frames.length;k++){
+                        array[wi][k].x=tmpw;
+                        tmpw+=array[wi][k].w;
+                        tmph=0;
+                        for(var l=0;l<maxhs.length;l++){
+                          tmph+=maxhs[l];
+                        }
+                        array[wi][k].y=tmph;
+                        
+                        if(tmpw>wi){
+                          if(tmpw>maxw){
+                            maxw=tmpw;
+                          }
+                          tmpw=0;
+													if(k+1<frames.length)
+                          	left.push(k+1);
+                          right.push(k);
+                          maxhs.push(array[wi][right[rowindex]].h);
+                          rowindex++;
+                        }
+                      }
+                      for(var l=0;l<maxhs.length;l++){
+                        maxh+=maxhs[l];
+                      }
+                      //console.log(maxh*maxw);
+                      if(minsize>maxh*maxw){
+                        minsize=maxh*maxw;
+                        tmpw2=maxw;
+                        tmph2=maxh;
+                        tmpwi=wi;
+                      }
+                    }
+                    console.log(tmpwi);
+                    for(var k=0;k<frames.length;k++){
+                      frames[k].x=array[tmpwi][k].x;
+                      frames[k].y=array[tmpwi][k].y;
+                    }
+                    //Sort.now(frames,"w");
+                    //packer.fit(frames);
+                    //console.log(packer.root.w,packer.root.h);
+                    var canvas2=document.createElement("canvas");
+                    canvas2.width=tmpw2;
+                    canvas2.height=tmph2;
                     var ctx = canvas2.getContext('2d');
                     
                     for(var n = 0 ; n < frames.length ; n++) {
                       var fr = frames[n];
-                      if (fr.fit) {
-                        ctx.putImageData(fr.data,fr.fit.x,fr.fit.y);
-                        fr.x=fr.fit.x;
-                        fr.y=fr.fit.y;
+                      //if (fr.fit) {
+                        ctx.putImageData(fr.data,fr.x,fr.y);
+                        //fr.x=fr.fit.x;
+                        //fr.y=fr.fit.y;
                         delete fr.data;
-                        delete fr.fit;
+                        //delete fr.fit;
                         //console.log(fr.fit.x, fr.fit.y, fr.w, fr.h);
-                      }
+                      //}
                     }
 
-                    //var dataurl = canvas2.toDataURL();
-                    //var blob = dataURItoBlob(dataurl);
+                    var dataurl = canvas2.toDataURL();
+                    var blob = dataURItoBlob(dataurl);
                     //delete dataurl;
                     //document.getElementById("output").innerHTML = "<img src='" + dataurl + "'>";
-                    //document.getElementById("dlid").href = window.URL.createObjectURL(blob);
+                    document.getElementById("dlid").href = window.URL.createObjectURL(blob);
                     
                     ObjArraySort(frames,"name");
-                    var data = JSON.stringify(frames,null,"  ");
+                    var _obj = {};
+                    _obj.frames=frames;
+                    var data = JSON.stringify(_obj,null,"  ");
                     document.getElementById("dlid2").href = window.URL.createObjectURL(new Blob([data], { type: 'text/plain' }));
                   }
                 };
