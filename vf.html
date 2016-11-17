@@ -43,7 +43,16 @@ overflow-y: hidden;
   <body>
     <script src="https://rawgit.com/rrf1050/test/master/build/phina.js"></script>
     <script>
-//console.log(Math.pow(2,0.5));
+window.onerror = function (msg, file, line, column, err) {
+    /*
+    msg: error message
+    file: file path
+    line: row number
+    column: column number
+    err: error object
+    */ 
+    alert("phina.util.Support.webAudio:"+phina.util.Support.webAudio+"\n"+msg + file + ':' + line);
+};
 // グローバルに展開
 phina.globalize();
 // 定数
