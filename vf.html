@@ -22,7 +22,7 @@ canvas{
   image-rendering: crisp-edges;
   -ms-interpolation-mode: nearest-neighbor;  /* IE (非標準プロパティ) */
   image-rendering: pixelated;
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-tap-highlight-color: rgba(0,0,0,0); 
 }
 html {
   font-size: 62.5%;
@@ -45,7 +45,7 @@ h1 {
 // グローバルに展開
 phina.globalize();
 // 定数
-//window.onerror = function (msg, file, line, column, err) {
+window.onerror = function (msg, file, line, column, err) {
     /*
     msg: error message
     file: file path
@@ -53,8 +53,8 @@ phina.globalize();
     column: column number
     err: error object
     */ 
-    //alert(msg + file + ':' + line);
-//};
+    alert(msg + file + ':' + line);
+};
 var ASSETS = {
   image: {
     bg25: "https://rawgit.com/rrf1050/test/master/graphic/haikei25.png",
@@ -1423,17 +1423,28 @@ phina.define("MainScene", {
     this.clist_c={};
     this.clist_c["root"] = GameConsole("root",null,["settings","exit"],this.m_center,120);
     var clists = [this.clist1,this.clist_c,this.clist2];
+    var pointflag=true;
     for(con in this.clist1){
       this.clist1[con].dummy.setInteractive(true);
       this.clist1[con].dummy.onpointstart=function(){
         if(this.getParent().visible){
-          if(this.getParent().getParent().alpha==0.25){
-            this.getParent().getParent().tweener.clear().to({alpha: 1},200,"easeOutQart");
+          pointflag=true;
+          clists.some(function(clist){
+              if(clist["root"].owner.alpha==1||clist["root"].owner.alpha==0.25){
+                pointflag=true;
+              }
+              else{
+                pointflag=false;
+                return true;
+              }
+            });
+          if(this.getParent().getParent().alpha==0.25&&pointflag){
+            this.getParent().getParent().tweener.clear().set({alpha: 0.26}).to({alpha: 1},200,"easeOutQart");
             clists.forEach(function(clist){
               if(clist["root"].owner.alpha==1){
-                clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQart");
+                clist["root"].owner.tweener.clear().set({alpha: 0.99}).to({alpha: 0.25},200,"easeOutQart");
               }
-            })
+            });
           }
         }
       }
@@ -1442,14 +1453,24 @@ phina.define("MainScene", {
       this.clist2[con].dummy.setInteractive(true);
       this.clist2[con].dummy.onpointstart=function(){
         if(this.getParent().visible){
-          if(this.getParent().getParent().alpha==0.25){
+          pointflag=true;
+          clists.some(function(clist){
+              if(clist["root"].owner.alpha==1||clist["root"].owner.alpha==0.25){
+                pointflag=true;
+              }
+              else{
+                pointflag=false;
+                return true;
+              }
+            });
+          if(this.getParent().getParent().alpha==0.25&&pointflag){
             
-            this.getParent().getParent().tweener.clear().to({alpha: 1},200,"easeOutQart");
+            this.getParent().getParent().tweener.clear().set({alpha: 0.26}).to({alpha: 1},200,"easeOutQart");
             clists.forEach(function(clist){
               if(clist["root"].owner.alpha==1){
-                clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQart");
+                clist["root"].owner.tweener.clear().set({alpha: 0.99}).to({alpha: 0.25},200,"easeOutQart");
               }
-            })
+            });
           }
         }
       }
@@ -1458,13 +1479,23 @@ phina.define("MainScene", {
       this.clist_c[con].dummy.setInteractive(true);
       this.clist_c[con].dummy.onpointstart=function(){
         if(this.getParent().visible){
-          if(this.getParent().getParent().alpha==0.25){
-            this.getParent().getParent().tweener.clear().to({alpha: 1},200,"easeOutQart");
+          pointflag=true;
+          clists.some(function(clist){
+              if(clist["root"].owner.alpha==1||clist["root"].owner.alpha==0.25){
+                pointflag=true;
+              }
+              else{
+                pointflag=false;
+                return true;
+              }
+            });
+          if(this.getParent().getParent().alpha==0.25&&pointflag){
+            this.getParent().getParent().tweener.clear().set({alpha: 0.26}).to({alpha: 1},200,"easeOutQart");
             clists.forEach(function(clist){
               if(clist["root"].owner.alpha==1){
-                clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQart");
+                clist["root"].owner.tweener.clear().set({alpha: 0.99}).to({alpha: 0.25},200,"easeOutQart");
               }
-            })
+            });
           }
         }
       }
