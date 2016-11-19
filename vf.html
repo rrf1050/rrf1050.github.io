@@ -1423,7 +1423,7 @@ phina.define("MainScene", {
     this.clist_c={};
     this.clist_c["root"] = GameConsole("root",null,["settings","exit"],this.m_center,120);
     var clists = [this.clist1,this.clist_c,this.clist2];
-    /*for(con in this.clist1){
+    for(con in this.clist1){
       this.clist1[con].dummy.setInteractive(true);
       this.clist1[con].dummy.onpointstart=function(){
         if(this.getParent().visible){
@@ -1469,7 +1469,7 @@ phina.define("MainScene", {
         }
       }
     }
-    */
+    
     this.menu2.alpha=0.25;
     
     
