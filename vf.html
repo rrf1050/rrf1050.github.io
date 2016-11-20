@@ -151,19 +151,23 @@ phina.define("GameConsole",{
     this.objects = [];
     this.owner = owner;
     this.parent = DisplayElement().addChildTo(owner);
-   
     this.parent.clip = function(canvas){
       canvas.beginPath();
       canvas.rect(x-25,102,52,25);
     };
-    this.dummy = DisplayElement().addChildTo(this.parent);
+    this.list = DisplayElement().addChildTo(this.parent);
+    this.dummy = DisplayElement().addChildTo(this.list);
     this.dummy.origin.set(0.5,0);
     this.dummy.x=x;
     this.dummy.y=102;
     this.dummy.width=52;
     this.dummy.height=25;
+    
+    this.dummy.enterflag=false;
+    this.dummy.upflag=false;
+    this.dummy.downflag=false;
+    
     if(this.name != "entry"){
-      this.list = DisplayElement().addChildTo(this.parent);
       Math.floor(5/elements.length+1).times(function(){
         elements.forEach(function(element){
           var sprite = Sprite(element).addChildTo(this.list);
@@ -181,16 +185,7 @@ phina.define("GameConsole",{
     }
   },
   update: function(pointer,keyboard,owner){
-    function statusupdate(owner){
-      var tmp=owner.pre_status;
-      owner.pre_status = owner.status;
-      owner.status = owner.object_ss.currentAnimation.self;
-      if(owner.pre_status===owner.status){
-        owner.pre_status=tmp;
-      }
-      owner.frame = owner.object_ss.currentFrameIndex;
-      //console.log(owner.pre_status,owner.status);
-    }
+    
     var y = 110;
     var y_offset = 12;
     if(this.name!="entry"){
@@ -215,113 +210,16 @@ phina.define("GameConsole",{
             this.keyqueue.shift();
           }
           if(key=="up"){
-            this.list.tweener.clear().by({
-              y: y_offset,
-            },200,"easeOutQuart").call(function(){
-              var buffer=[];
-              this.objects.forEach(function(obj,i){
-                obj.y=0;
-                if(i<this.objects.length-1)
-                  buffer[i+1]=obj;
-                else{
-                  buffer[0]=obj;
-                }
-              },this);
-              this.objects=buffer;
-              this.objects[0].y=y;
-              this.objects[1].y=y+y_offset;
-              this.objects[2].y=y+y_offset*2;
-              this.objects[this.objects.length-1].y=y-y_offset;
-              this.objects[this.objects.length-2].y=y-y_offset*2;
-              this.list.y=0;
-            },this);
-            
+            this.up(y_offset);
           }
           else if(key=="down"){
-            this.list.tweener.clear().by({
-              y: -y_offset,
-            },200,"easeOutQuart").call(function(){
-              var buffer=[];
-              this.objects.forEach(function(obj,i){
-                obj.y=0;
-                if(0<i)
-                  buffer[i-1]=obj;
-                else{
-                  buffer[this.objects.length-1]=obj;
-                }
-              },this);
-              this.objects=buffer;
-              this.objects[0].y=y;
-              this.objects[1].y=y+y_offset;
-              this.objects[2].y=y+y_offset*2;
-              this.objects[this.objects.length-1].y=y-y_offset;
-              this.objects[this.objects.length-2].y=y-y_offset*2;
-              this.list.y=0;
-            },this);
+            this.down(y_offset);
           }
           else if(key=="z"){
             this.keyqueue=[];
-            switch(this.name){
-              case "root": 
-                switch(this.objects[0].name){
-                  case "color":
-                    if(this.controlobj.object.name.match("yukari"))
-                      return "color_y";
-                    else if(this.controlobj.object.name.match("maki"))
-                      return "color_m";
-                      break;
-                  default:
-                    return this.objects[0].name;
-                }
-                break;
-              case "color_y":
-                switch(this.objects[0].name){
-                  case "back":
-                    this.resetorder();
-                    return this.parentname;
-                  default:
-                    statusupdate(this.controlobj);
-                    var tmpx=this.controlobj.object.x,tmpy=this.controlobj.object.y;
-                    var chara="yukari";
-                    var objname=chara+"_"+this.objects[0].name;
-                    var objssname=objname+"_ss";
-                    this.controlobj.object_ss.remove();
-                    this.controlobj.object.remove();
-                    this.controlobj.object=Sprite(objname).addChildTo(owner.fighters);
-                    this.controlobj.object.setPosition(tmpx,tmpy);
-                    this.controlobj.object.origin.set(0,0);
-                    this.controlobj.object.frameIndex=0;
-                    this.controlobj.object_ss = FrameAnimation(objssname);
-                    this.controlobj.object_ss.attachTo(this.controlobj.object);
-                    this.controlobj.object_ss.gotoAndPlay(this.controlobj.status);
-                    this.controlobj.object_ss.currentFrameIndex=this.controlobj.frame;
-                    break;
-                }
-                break;
-              case "color_m":
-                switch(this.objects[0].name){
-                  case "back":
-                    this.resetorder();
-                    return this.parentname;
-                  default:
-                    statusupdate(this.controlobj);
-                    var tmpx=this.controlobj.object.x,tmpy=this.controlobj.object.y;
-                    var chara="maki";
-                    var objname=chara+"_"+this.objects[0].name;
-                    var objssname=objname+"_ss";
-                    this.controlobj.object_ss.remove();
-                    this.controlobj.object.remove();
-                    this.controlobj.object=Sprite(objname).addChildTo(owner.fighters);
-                    this.controlobj.object.setPosition(tmpx,tmpy);
-                    this.controlobj.object.origin.set(0,0);
-                    this.controlobj.object.frameIndex=0;
-                    this.controlobj.controlobj.object_ss = FrameAnimation(objssname);
-                    this.controlobj.object_ss.attachTo(this.controlobj.object);
-                    this.controlobj.object_ss.gotoAndPlay(this.controlobj.status);
-                    this.controlobj.object_ss.currentFrameIndex=this.controlobj.frame;
-                    break;
-                }
-                break;
+            var ret = this.enter(owner);
+            if(ret != null){
+              return ret;
             }
           }
           else if(key=="x"){
@@ -331,6 +229,23 @@ phina.define("GameConsole",{
           }
         }
       }
+      else{
+        if(this.dummy.enterflag){
+          this.dummy.enterflag=false;
+          var ret = this.enter(owner);
+          if(ret != null){
+            return ret;
+          }
+        }
+        else if(this.dummy.upflag){
+          this.dummy.upflag=false;
+          this.up(y_offset);
+        }
+        else if(this.dummy.downflag){
+          this.dummy.downflag=false;
+          this.down(y_offset);
+        }
+      }
       return this.name;
     }
     else{
@@ -338,6 +253,137 @@ phina.define("GameConsole",{
         return this.parentname;
       }
       return this.name;
+    }
+  },
+  up: function(val){
+    var y = 110;
+    var y_offset = val;
+    this.list.tweener.clear().to({
+      y: y_offset,
+    },200,"easeOutQuart").call(function(){
+      var buffer=[];
+      this.objects.forEach(function(obj,i){
+        obj.y=0;
+        if(i<this.objects.length-1)
+          buffer[i+1]=obj;
+        else{
+          buffer[0]=obj;
+        }
+      },this);
+      this.objects=buffer;
+      this.objects[0].y=y;
+      this.objects[1].y=y+y_offset;
+      this.objects[2].y=y+y_offset*2;
+      this.objects[this.objects.length-1].y=y-y_offset;
+      this.objects[this.objects.length-2].y=y-y_offset*2;
+      this.list.y=0;
+    },this);
+  },
+  down: function(val){
+    var y = 110;
+    var y_offset = val;
+    this.list.tweener.clear().to({
+      y: -y_offset,
+    },200,"easeOutQuart").call(function(){
+      var buffer=[];
+      this.objects.forEach(function(obj,i){
+        obj.y=0;
+        if(0<i)
+          buffer[i-1]=obj;
+        else{
+          buffer[this.objects.length-1]=obj;
+        }
+      },this);
+      this.objects=buffer;
+      this.objects[0].y=y;
+      this.objects[1].y=y+y_offset;
+      this.objects[2].y=y+y_offset*2;
+      this.objects[this.objects.length-1].y=y-y_offset;
+      this.objects[this.objects.length-2].y=y-y_offset*2;
+      this.list.y=0;
+    },this);
+  },
+  enter: function(owner){
+    function statusupdate(owner){
+      var tmp=owner.pre_status;
+      owner.pre_status = owner.status;
+      owner.status = owner.object_ss.currentAnimation.self;
+      if(owner.pre_status===owner.status){
+        owner.pre_status=tmp;
+      }
+      owner.frame = owner.object_ss.currentFrameIndex;
+      //console.log(owner.pre_status,owner.status);
+    }
+    switch(this.name){
+      case "root": 
+        switch(this.objects[0].name){
+          case "color":
+            if(this.controlobj.object.name.match("yukari"))
+              return "color_y";
+            else if(this.controlobj.object.name.match("maki"))
+              return "color_m";
+              break;
+          default:
+            return this.objects[0].name;
+        }
+        break;
+      case "color_y":
+        switch(this.objects[0].name){
+          case "back":
+            this.resetorder();
+            return this.parentname;
+          default:
+            statusupdate(this.controlobj);
+            var tmpx=this.controlobj.object.x,tmpy=this.controlobj.object.y;
+            var chara="yukari";
+            var objname=chara+"_"+this.objects[0].name;
+            var objssname=objname+"_ss";
+            this.controlobj.object_ss.remove();
+            this.controlobj.object.remove();
+            this.controlobj.object=Sprite(objname).addChildTo(owner.fighters);
+            this.controlobj.object.setPosition(tmpx,tmpy);
+            this.controlobj.object.origin.set(0,0);
+            this.controlobj.object.frameIndex=0;
+            this.controlobj.object_ss = FrameAnimation(objssname);
+            this.controlobj.object_ss.attachTo(this.controlobj.object);
+            this.controlobj.object_ss.gotoAndPlay(this.controlobj.status);
+            this.controlobj.object_ss.currentFrameIndex=this.controlobj.frame;
+            break;
+        }
+        break;
+      case "color_m":
+        switch(this.objects[0].name){
+          case "back":
+            this.resetorder();
+            return this.parentname;
+          default:
+            statusupdate(this.controlobj);
+            var tmpx=this.controlobj.object.x,tmpy=this.controlobj.object.y;
+            var chara="maki";
+            var objname=chara+"_"+this.objects[0].name;
+            var objssname=objname+"_ss";
+            this.controlobj.object_ss.remove();
+            this.controlobj.object.remove();
+            this.controlobj.object=Sprite(objname).addChildTo(owner.fighters);
+            this.controlobj.object.setPosition(tmpx,tmpy);
+            this.controlobj.object.origin.set(0,0);
+            this.controlobj.object.frameIndex=0;
+            this.controlobj.controlobj.object_ss = FrameAnimation(objssname);
+            this.controlobj.object_ss.attachTo(this.controlobj.object);
+            this.controlobj.object_ss.gotoAndPlay(this.controlobj.status);
+            this.controlobj.object_ss.currentFrameIndex=this.controlobj.frame;
+            break;
+        }
+        break;
+      case "charactor":
+        switch(this.objects[0].name){
+          case "back":
+            this.resetorder();
+            return this.parentname;
+          default:
+            //TODO
+            break;
+        }
     }
   },
   resetorder: function(){
@@ -1424,84 +1470,73 @@ phina.define("MainScene", {
     this.clist_c["root"] = GameConsole("root",null,["settings","exit"],this.m_center,120);
     var clists = [this.clist1,this.clist_c,this.clist2];
     var pointflag=true;
-    for(con in this.clist1){
-      this.clist1[con].dummy.setInteractive(true);
-      this.clist1[con].dummy.onpointstart=function(e){
-        var p = e.interactive.app.touchList.touches;
-        if(this.getParent().visible&&p.length==1){
-          pointflag=true;
-          clists.some(function(clist){
-              if(clist["root"].owner.alpha==1||clist["root"].owner.alpha==0.25){
-                pointflag=true;
-              }
-              else{
-                pointflag=false;
-                return true;
-              }
-            });
-          if(this.getParent().getParent().alpha==0.25&&pointflag){
-            this.getParent().getParent().tweener.clear().set({alpha: 0.26}).to({alpha: 1},200,"easeOutQart");
-            clists.forEach(function(clist){
-              if(clist["root"].owner.alpha==1){
-                clist["root"].owner.tweener.clear().set({alpha: 0.99}).to({alpha: 0.25},200,"easeOutQart");
-              }
-            });
-          }
+    this.pcflag=false;
+    var conpstart = function(e){
+      var tl = e.interactive.app.touchList.touches;
+      if(this.getParent().getParent().visible&&tl.length==1){
+        pointflag=true;
+        clists.some(function(clist){
+            if(clist["root"].owner.alpha==1||clist["root"].owner.alpha==0.25){
+              pointflag=true;
+            }
+            else{
+              pointflag=false;
+              return true;
+            }
+          });
+        if(this.getParent().getParent().getParent().alpha==0.25&&pointflag){
+          this.getParent().getParent().getParent().tweener.clear().set({alpha: 0.26}).to({alpha: 1},200,"easeOutQuart");
+          clists.forEach(function(clist){
+            if(clist["root"].owner.alpha==1){
+              clist["root"].owner.tweener.clear().set({alpha: 0.99}).to({alpha: 0.25},200,"easeOutQuart");
+            }
+          });
+        }
+        else if(this.getParent().getParent().getParent().alpha==1&&pointflag){
+          this.pcflag=true;
         }
       }
+    };
+    var conpmove = function(e){
+      if(this.getParent().getParent().visible&&this.pcflag){
+        if(-6<=this.getParent().y&&this.getParent().y<=6)
+          this.getParent().moveBy(0,e.pointer.deltaPosition.y);
+      }
+    }
+    var conpend = function(e){
+      if(this.getParent().getParent().visible&&this.pcflag){
+        this.pcflag=false;
+        if(this.getParent().y<-6||6<this.getParent().y){
+          if(this.getParent().y<-6){
+            this.downflag=true;
+          }
+          else{
+            this.upflag=true;
+          }
+        }
+        else if(this.getParent().y==0){
+          this.enterflag=true;
+        }
+        else{
+          this.getParent().tweener.clear().to({y: 0},100,"easeOutQuart");
+        }
+      }
+    };
+    for(con in this.clist1){
+      this.clist1[con].dummy.setInteractive(true);
+      this.clist1[con].dummy.onpointstart=conpstart;
+      this.clist1[con].dummy.onpointmove=conpmove;
+      this.clist1[con].dummy.onpointend=conpend;
     }
     for(con in this.clist2){
       this.clist2[con].dummy.setInteractive(true);
-      this.clist2[con].dummy.onpointstart=function(e){
-        var p = e.interactive.app.touchList.touches;
-        if(this.getParent().visible&&p.length==1){
-          pointflag=true;
-          clists.some(function(clist){
-              if(clist["root"].owner.alpha==1||clist["root"].owner.alpha==0.25){
-                pointflag=true;
-              }
-              else{
-                pointflag=false;
-                return true;
-              }
-            });
-          if(this.getParent().getParent().alpha==0.25&&pointflag){
-            
-            this.getParent().getParent().tweener.clear().set({alpha: 0.26}).to({alpha: 1},200,"easeOutQart");
-            clists.forEach(function(clist){
-              if(clist["root"].owner.alpha==1){
-                clist["root"].owner.tweener.clear().set({alpha: 0.99}).to({alpha: 0.25},200,"easeOutQart");
-              }
-            });
-          }
-        }
-      }
+      this.clist2[con].dummy.onpointstart=conpstart;
+      this.clist2[con].dummy.onpointend=conpend;
     }
     for(con in this.clist_c){
       this.clist_c[con].dummy.setInteractive(true);
-      this.clist_c[con].dummy.onpointstart=function(e){
-        var p = e.interactive.app.touchList.touches;
-        if(this.getParent().visible&&p.length==1){
-          pointflag=true;
-          clists.some(function(clist){
-              if(clist["root"].owner.alpha==1||clist["root"].owner.alpha==0.25){
-                pointflag=true;
-              }
-              else{
-                pointflag=false;
-                return true;
-              }
-            });
-          if(this.getParent().getParent().alpha==0.25&&pointflag){
-            this.getParent().getParent().tweener.clear().set({alpha: 0.26}).to({alpha: 1},200,"easeOutQart");
-            clists.forEach(function(clist){
-              if(clist["root"].owner.alpha==1){
-                clist["root"].owner.tweener.clear().set({alpha: 0.99}).to({alpha: 0.25},200,"easeOutQart");
-              }
-            });
-          }
-        }
-      }
+      this.clist_c[con].dummy.onpointstart=conpstart;
+      this.clist_c[con].dummy.onpointend = conpend;
     }
     
     this.menu2.alpha=0.25;
@@ -1570,16 +1605,16 @@ phina.define("MainScene", {
     if(app.keyboard.getKeyDown("right")){
       clists.forEach(function(clist,i){
         if(clist["root"].owner.alpha==1){
-          clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQart");
-          clists[(i+1)%clists.length]["root"].owner.tweener.clear().to({alpha: 1},200,"easeOutQart");
+          clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQuart");
+          clists[(i+1)%clists.length]["root"].owner.tweener.clear().to({alpha: 1},200,"easeOutQuart");
         }
       },this);
     }
     else if(app.keyboard.getKeyDown("left")){
       clists.forEach(function(clist,i){
         if(clist["root"].owner.alpha==1){
-          clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQart");
-          clists[(i-1)*(i-1<0?-(clists.length-1):1)]["root"].owner.tweener.clear().to({alpha: 1},200,"easeOutQart");
+          clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQuart");
+          clists[(i-1)*(i-1<0?-(clists.length-1):1)]["root"].owner.tweener.clear().to({alpha: 1},200,"easeOutQuart");
         }
       },this);
     }
@@ -1766,6 +1801,7 @@ phina.define("MainScene", {
       this.karaburiflag2_p=true;
     if(this.karaburiflag1_e)
       this.karaburiflag2_e=true;
+      
     //console.log(this.enemy.mode,this.enemy.sitcounter,this.enemy.sit,this.enemy.input.down);
      //console.log(app.canvas.miterLimit);
      
