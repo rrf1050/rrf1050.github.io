@@ -1499,8 +1499,15 @@ phina.define("MainScene", {
     };
     var conpmove = function(e){
       if(this.getParent().getParent().visible&&this.pcflag){
-        if(-6<=this.getParent().y&&this.getParent().y<=6)
+        if(-6<=this.getParent().y&&this.getParent().y<=6){
           this.getParent().moveBy(0,e.pointer.deltaPosition.y);
+        }
+        else if(this.getParent().y<-6){
+          this.getParent().y=-7;
+        }
+        else{
+          this.getParent().y=7;
+        }
       }
     }
     var conpend = function(e){
@@ -1531,11 +1538,13 @@ phina.define("MainScene", {
     for(con in this.clist2){
       this.clist2[con].dummy.setInteractive(true);
       this.clist2[con].dummy.onpointstart=conpstart;
+      this.clist2[con].dummy.onpointmove=conpmove;
       this.clist2[con].dummy.onpointend=conpend;
     }
     for(con in this.clist_c){
       this.clist_c[con].dummy.setInteractive(true);
       this.clist_c[con].dummy.onpointstart=conpstart;
+      this.clist_c[con].dummy.onpointmove = conpmove;
       this.clist_c[con].dummy.onpointend = conpend;
     }
     
