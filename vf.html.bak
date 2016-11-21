@@ -65,7 +65,7 @@ h1 {
    <script src="https://rawgit.com/rrf1050/test/master/build/phina.js" crossorigin="anonymous"></script> 
    <!--<script src="http://cdn.rawgit.com/phi-jp/phina.js/v0.2.0/build/phina.js"></script> !-->
     <script>//console.log(Math.pow(2,0.5));
-/*document.addEventListener('touchmove', function(evt) {
+document.addEventListener('touchmove', function(evt) {
     evt.preventDefault();
 });
 document.addEventListener('touchstart', function(evt) {
@@ -73,7 +73,7 @@ document.addEventListener('touchstart', function(evt) {
 });
 document.addEventListener('touchend', function(evt) {
     evt.preventDefault();
-});*/
+});
 // グローバルに展開
 phina.globalize();
 // 定数
