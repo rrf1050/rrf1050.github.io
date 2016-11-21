@@ -67,7 +67,7 @@ h1 {
     <script>//console.log(Math.pow(2,0.5));
 document.addEventListener('touchmove', function(evt) {
     if (!$('.scrollable').has($(e.target)).length) e.preventDefault();
-});
+},{passive:true});
 /*
 document.addEventListener('touchstart', function(evt) {
     evt.preventDefault();
