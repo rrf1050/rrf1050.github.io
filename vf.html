@@ -74,6 +74,9 @@ var ASSETS = {
     origin: "https://rawgit.com/rrf1050/test/master/graphic/surface/Origin.png",
     legacy: "https://rawgit.com/rrf1050/test/master/graphic/surface/Legacy.png",
     white: "https://rawgit.com/rrf1050/test/master/graphic/surface/White.png",
+    
+    ready: "https://rawgit.com/rrf1050/test/master/graphic/decolate/Ready.png",
+    fight: "https://rawgit.com/rrf1050/test/master/graphic/decolate/Fight.png",
   },
 	spritesheet: {
 		"yukari_legacy_ss":"https://rawgit.com/rrf1050/test/master/ss/yukari25_c16.json",
@@ -249,7 +252,11 @@ phina.define("GameConsole",{
       return this.name;
     }
     else{
+      this.controlobj.mode="standby";
+      this.controlobj.target.mode="standby";
       if(keyboard.getKeyDown("x")){
+        this.controlobj.mode="safe";
+        this.controlobj.target.mode="safe";
         return this.parentname;
       }
       return this.name;
@@ -838,7 +845,7 @@ phina.define("GameObject",{
       }
       else{
         this.input.down=false;
-        this.input.up=true;
+        this.input.up=false;
         if(this.isenemy){
           if(this.object.x>=310/FOUR){
             this.input.left=true;
@@ -855,31 +862,6 @@ phina.define("GameObject",{
             this.input.left=true;
           }
         }
-      }
-    }
-    if(keyboard){
-      if(keyboard.getKeyDown("space")){
-        var tmpx=this.object.x,tmpy=this.object.y;
-        var objname="";
-        var objssname="";
-        if(this.object.name=="yukari_legacy"){
-          objname="yukari_origin";
-          objssname="yukari_origin_ss";
-        }
-        else if(this.object.name=="yukari_origin"){
-          objname="yukari_legacy";
-          objssname="yukari_legacy_ss";
-        }
-        this.object_ss.remove();
-        this.object.remove();
-        this.object=Sprite(objname).addChildTo(owner);
-        this.object.setPosition(tmpx,tmpy);
-        this.object.origin.set(0,0);
-        this.object.frameIndex=0;
-        this.object_ss = FrameAnimation(objssname);
-        this.object_ss.attachTo(this.object);
-        this.object_ss.gotoAndPlay(this.status);
-        this.object_ss.currentFrameIndex=this.frame;
       }
     }
     
@@ -1547,11 +1529,15 @@ phina.define("MainScene", {
       this.clist_c[con].dummy.onpointmove = conpmove;
       this.clist_c[con].dummy.onpointend = conpend;
     }
-    
     this.menu2.alpha=0.25;
-    
-    
     this.m_center.alpha = 0.25;
+    
+    this.decolate = DisplayElement().addChildTo(this);
+    
+    this.ready = Sprite("ready").addChildTo(this.decolate);
+    this.fight = Sprite("fight").addChildTo(this.decolate);
+    
+    this.decolate.hide();
     
     this.hanteilist = [];
     var _hanteis = ["hantei0","hantei1","hantei2","hantei3","hantei4","hantei5","hantei6","hantei7","hantei8","hantei9","hantei10","hantei11","hantei12","hantei13","hantei14","hantei15","hantei16","hantei17","hantei18","hantei19"
@@ -1610,51 +1596,52 @@ phina.define("MainScene", {
     }
     
     var clists = [this.clist1,this.clist_c,this.clist2];
-    
-    if(app.keyboard.getKeyDown("right")){
-      clists.forEach(function(clist,i){
-        if(clist["root"].owner.alpha==1){
-          clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQuart");
-          clists[(i+1)%clists.length]["root"].owner.tweener.clear().to({alpha: 1},200,"easeOutQuart");
-        }
-      },this);
-    }
-    else if(app.keyboard.getKeyDown("left")){
-      clists.forEach(function(clist,i){
-        if(clist["root"].owner.alpha==1){
-          clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQuart");
-          clists[(i-1)*(i-1<0?-(clists.length-1):1)]["root"].owner.tweener.clear().to({alpha: 1},200,"easeOutQuart");
-        }
-      },this);
-    }
-    
-    var conname;
-    if(this.clist1["root"].owner.alpha==1){
-      for(con in this.clist1){
-        if(this.clist1[con].parent.visible){
-          conname=this.clist1[con].update(app.pointer,app.keyboard,this);
-          this.clist1[con].parent.hide();
-        }
+    if(this.surface.visible){
+      if(app.keyboard.getKeyDown("right")){
+        clists.forEach(function(clist,i){
+          if(clist["root"].owner.alpha==1){
+            clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQuart");
+            clists[(i+1)%clists.length]["root"].owner.tweener.clear().to({alpha: 1},200,"easeOutQuart");
+          }
+        },this);
       }
-      this.clist1[conname].parent.show();
-    }
-    if(this.clist2["root"].owner.alpha==1){
-      for(con in this.clist2){
-        if(this.clist2[con].parent.visible&&this.clist2[con].owner.alpha==1){
-          conname=this.clist2[con].update(app.pointer,app.keyboard,this);
-          this.clist2[con].parent.hide();
-        }
+      else if(app.keyboard.getKeyDown("left")){
+        clists.forEach(function(clist,i){
+          if(clist["root"].owner.alpha==1){
+            clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQuart");
+            clists[(i-1)*(i-1<0?-(clists.length-1):1)]["root"].owner.tweener.clear().to({alpha: 1},200,"easeOutQuart");
+          }
+        },this);
       }
-      this.clist2[conname].parent.show();
-    }
-    if(this.clist_c["root"].owner.alpha==1){
-      for(con in this.clist_c){
-        if(this.clist_c[con].parent.visible&&this.clist_c[con].owner.alpha==1){
-          conname=this.clist_c[con].update(app.pointer,app.keyboard,this);
-          this.clist_c[con].parent.hide();
+      
+      var conname;
+      if(this.clist1["root"].owner.alpha==1){
+        for(con in this.clist1){
+          if(this.clist1[con].parent.visible){
+            conname=this.clist1[con].update(app.pointer,app.keyboard,this);
+            this.clist1[con].parent.hide();
+          }
         }
+        this.clist1[conname].parent.show();
       }
-      this.clist_c[conname].parent.show();
+      if(this.clist2["root"].owner.alpha==1){
+        for(con in this.clist2){
+          if(this.clist2[con].parent.visible&&this.clist2[con].owner.alpha==1){
+            conname=this.clist2[con].update(app.pointer,app.keyboard,this);
+            this.clist2[con].parent.hide();
+          }
+        }
+        this.clist2[conname].parent.show();
+      }
+      if(this.clist_c["root"].owner.alpha==1){
+        for(con in this.clist_c){
+          if(this.clist_c[con].parent.visible&&this.clist_c[con].owner.alpha==1){
+            conname=this.clist_c[con].update(app.pointer,app.keyboard,this);
+            this.clist_c[con].parent.hide();
+          }
+        }
+        this.clist_c[conname].parent.show();
+      }
     }
     var bgs = [];
     bgs.push(this.bg);
@@ -1810,7 +1797,28 @@ phina.define("MainScene", {
       this.karaburiflag2_p=true;
     if(this.karaburiflag1_e)
       this.karaburiflag2_e=true;
-      
+    
+    var clists2 = [this.clist1,this.clist2];
+    var fightflag=false;
+    clists2.forEach(function(clist,i){
+      if(clist["entry"].parent.visible){
+        var obj=clist["entry"].controlobj;
+        if(obj.mode=="standby"&&obj.status=="idol"&&obj.target.mode=="standby"&&obj.target.status=="idol"){
+          fightflag = true;
+          var controlobj = obj;
+        }
+      }
+    },this);
+    if(fightflag){
+      fightflag=false;
+      this.surface.hide();
+      this.decolate.show();
+      this.ready.show();
+      this.fight.hide();
+      this.readySE.play();
+      this.ready.tweener.clear().set({x: SCREEN_WIDTH/2,y:-18}).to();
+      //TODO
+    }
     //console.log(this.enemy.mode,this.enemy.sitcounter,this.enemy.sit,this.enemy.input.down);
      //console.log(app.canvas.miterLimit);
      
