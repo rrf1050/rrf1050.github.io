@@ -68,6 +68,7 @@ document.addEventListener('touchmove', function(evt) {
     evt.preventDefault();
 });
 document.onselectstart = function() { return false; };
+canvas.onselectstart = function() { return false; };
 // グローバルに展開
 phina.globalize();
 // 定数
