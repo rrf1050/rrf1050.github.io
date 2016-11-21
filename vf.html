@@ -1581,6 +1581,8 @@ phina.define("MainScene", {
     this.SEpool.forEach(function(se){
       se.volume=0.15;
     });
+    this.fflag=false;
+    this.pre_fflag=false;
   },
   
   // 更新
@@ -1799,18 +1801,16 @@ phina.define("MainScene", {
       this.karaburiflag2_e=true;
     
     var clists2 = [this.clist1,this.clist2];
-    var fightflag=false;
     clists2.forEach(function(clist,i){
       if(clist["entry"].parent.visible){
         var obj=clist["entry"].controlobj;
         if(obj.mode=="standby"&&obj.status=="idol"&&obj.target.mode=="standby"&&obj.target.status=="idol"){
-          fightflag = true;
+          this.fflag = true;
           var controlobj = obj;
         }
       }
     },this);
-    if(fightflag){
-      fightflag=false;
+    if(this.fflag&&!this.pre_fflag){
       this.surface.hide();
       this.decolate.show();
       this.ready.show();
@@ -1821,7 +1821,7 @@ phina.define("MainScene", {
     }
     //console.log(this.enemy.mode,this.enemy.sitcounter,this.enemy.sit,this.enemy.input.down);
      //console.log(app.canvas.miterLimit);
-     
+     this.pre_fflag=fflag;
   }
 });
 
@@ -1844,4 +1844,3 @@ phina.main(function() {
 </script>
   </body>
 </html>
-
