@@ -38,6 +38,7 @@ canvas{
 -ms-user-select: none;
 -o-user-select: none;
 user-select: none;
+-webkit-tap-highlight-color: rgba(0,0,0,0); 
 }
 html {
   font-size: 62.5%;
@@ -67,8 +68,6 @@ h1 {
 document.addEventListener('touchmove', function(evt) {
     evt.preventDefault();
 });
-document.onselectstart = function() { return false; };
-canvas.onselectstart = function() { return false; };
 // グローバルに展開
 phina.globalize();
 // 定数
