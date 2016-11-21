@@ -311,16 +311,6 @@ phina.define("GameConsole",{
     },this);
   },
   enter: function(owner){
-    function statusupdate(owner){
-      var tmp=owner.pre_status;
-      owner.pre_status = owner.status;
-      owner.status = owner.object_ss.currentAnimation.self;
-      if(owner.pre_status===owner.status){
-        owner.pre_status=tmp;
-      }
-      owner.frame = owner.object_ss.currentFrameIndex;
-      //console.log(owner.pre_status,owner.status);
-    }
     switch(this.name){
       case "root": 
         switch(this.objects[0].name){
@@ -340,7 +330,7 @@ phina.define("GameConsole",{
             this.resetorder();
             return this.parentname;
           default:
-            statusupdate(this.controlobj);
+            this.controlobj.statusupdate();
             var tmpx=this.controlobj.object.x,tmpy=this.controlobj.object.y;
             var chara="yukari";
             var objname=chara+"_"+this.objects[0].name;
@@ -364,7 +354,7 @@ phina.define("GameConsole",{
             this.resetorder();
             return this.parentname;
           default:
-            statusupdate(this.controlobj);
+            this.controlobj.statusupdate();
             var tmpx=this.controlobj.object.x,tmpy=this.controlobj.object.y;
             var chara="maki";
             var objname=chara+"_"+this.objects[0].name;
@@ -487,23 +477,13 @@ phina.define("GameObject",{
     this.winposecounter=0;
     this.sitcounter=0;
     this.cattackcounter=0;
-    
+    this.attackable=true;
   },
   update: function(pointer,pointers,keyboard,owner){
     
     
     
-    function statusupdate(owner){
-      var tmp=owner.pre_status;
-      owner.pre_status = owner.status;
-      owner.status = owner.object_ss.currentAnimation.self;
-      if(owner.pre_status===owner.status){
-        owner.pre_status=tmp;
-      }
-      owner.frame = owner.object_ss.currentFrameIndex;
-      //console.log(owner.pre_status,owner.status);
-    }
-    statusupdate(this);//アニメーション完了による状態変更を適用
+    this.statusupdate();//アニメーション完了による状態変更を適用
     
     if(this.status!=="damage"&&this.status!=="jdamage"&&this.status!=="sdamage"&&this.status!=="counterdamage"
     &&this.status!=="jump"&&this.status!=="jslash"&&this.status!=="dash"&&this.status!=="slash"
@@ -516,14 +496,18 @@ phina.define("GameObject",{
     if(this.status==="jump"&&this.pre_status==="jslash"&&!this.s_shiftflag){
       this.s_shiftflag=true;
       this.object_ss.currentFrameIndex=this.counter_hold;
-      statusupdate(this);
+      this.statusupdate();
     }
     if(this.status==="idol"&&this.pre_status==="jump"){
       this.jslash_count=0;
     }
     if(this.status==="idol"&&this.towinpose){
       this.object_ss.gotoAndPlay("winpose");
-      statusupdate(this);
+      this.statusupdate();
+    }
+    if(this.status ==="down"&&this.pre_status=="shirimochi"&&this.frame==0&&this.hitpoint==0){
+      this.object_ss.gotoAndPlay("dead");
+      this.statusupdate();
     }
     if(this.status == "jdamage_keep"&&this.pre_status=="jdamage"&&!this.s_shiftflag){
       this.s_shiftflag=true;
@@ -535,7 +519,7 @@ phina.define("GameObject",{
       }
       //console.log(tmp);
       this.object_ss.currentFrameIndex=tmp;
-      statusupdate(this);
+      this.statusupdate();
     }
     if(this.status==="idol"&&this.pre_status==="damage"){
       this.hitflag=false;
@@ -808,14 +792,14 @@ phina.define("GameObject",{
             if(this.target.object.x<this.object.x){
               if(this.status=="idol"){
                 this.object_ss.gotoAndPlay("dash");
-                statusupdate(this);
+                this.statusupdate();
               }
               this.input.left=true;
             }
             else{
               if(this.status=="idol"){
                 this.object_ss.gotoAndPlay("dash");
-                statusupdate(this);
+                this.statusupdate();
               }
               this.input.right=true;
             }
@@ -864,6 +848,10 @@ phina.define("GameObject",{
         }
       }
     }
+    if(!this.attackable){
+      this.input.a=false;
+    }
+    
     
     //入力から状態を決定
     if(!this.input.left){
@@ -886,11 +874,11 @@ phina.define("GameObject",{
           this.df2_l=false;
         }
         this.object_ss.gotoAndPlay("idol");
-        statusupdate(this);
+        this.statusupdate();
       }
       else if(this.direction=="right"&&(this.status==="backwalkbegin"||this.status==="backwalk")){
         this.object_ss.gotoAndPlay("idol");
-        statusupdate(this);
+        this.statusupdate();
       }
     }
     if(!this.input.right){
@@ -912,17 +900,17 @@ phina.define("GameObject",{
           this.df2_r=false;
         }
         this.object_ss.gotoAndPlay("idol");
-        statusupdate(this);
+        this.statusupdate();
       }
       else if(this.direction=="left"&&(this.status==="backwalkbegin"||this.status==="backwalk")){
         this.object_ss.gotoAndPlay("idol");
-        statusupdate(this);
+        this.statusupdate();
       }
     }
     if(!this.input.down){
       if(this.status==="sit"){
           this.object_ss.gotoAndPlay("standup");
-          statusupdate(this);
+          this.statusupdate();
         }
     }
     if(this.input.left){
@@ -930,7 +918,7 @@ phina.define("GameObject",{
         this.df3_l=false;
         if(this.status==="idol"){
           this.object_ss.gotoAndPlay("dash");
-          statusupdate(this);
+          this.statusupdate();
         }
       }
       this.df1_l=true;
@@ -940,11 +928,11 @@ phina.define("GameObject",{
 				if(this.status === "idol"||this.status == "walk"||this.status == "walkbegin"){
 					if(this.direction ==="left"){
 						this.object_ss.gotoAndPlay("dash");
-            statusupdate(this);
+            this.statusupdate();
 					}
 					else{
 						this.object_ss.gotoAndPlay("backstep");
-            statusupdate(this);
+            this.statusupdate();
 					}
 				}
 			}
@@ -955,13 +943,13 @@ phina.define("GameObject",{
       if(this.direction=="left"){
         if(this.status==="idol"||this.status==="backwalk"||this.status==="backwalkbegin"){
           this.object_ss.gotoAndPlay("walkbegin");
-          statusupdate(this);
+          this.statusupdate();
         }
       }
       else{
         if(this.status==="idol"||this.status==="walk"||this.status==="walkbegin"){
           this.object_ss.gotoAndPlay("backwalkbegin");
-          statusupdate(this);
+          this.statusupdate();
         }
       }
     }
@@ -970,7 +958,7 @@ phina.define("GameObject",{
         this.df3_r=false;
         if(this.status==="idol"){
           this.object_ss.gotoAndPlay("dash");
-          statusupdate(this);
+          this.statusupdate();
         }
       }
       this.df1_r=true;
@@ -980,11 +968,11 @@ phina.define("GameObject",{
 				if(this.status === "idol"||this.status == "walk"||this.status == "walkbegin"){
 					if(this.direction ==="right"){
 						this.object_ss.gotoAndPlay("dash");
-            statusupdate(this);
+            this.statusupdate();
 					}
 					else{
 						this.object_ss.gotoAndPlay("backstep");
-            statusupdate(this);
+            this.statusupdate();
 					}
 				}
 			}
@@ -995,60 +983,60 @@ phina.define("GameObject",{
       if(this.direction=="right"){
         if(this.status==="idol"||this.status==="backwalk"||this.status==="backwalkbegin"){
           this.object_ss.gotoAndPlay("walkbegin");
-          statusupdate(this);
+          this.statusupdate();
         }
       }
       else{
         if(this.status==="idol"||this.status==="walk"||this.status==="walkbegin"){
          this.object_ss.gotoAndPlay("backwalkbegin");
-         statusupdate(this);
+         this.statusupdate();
         }
       }
     }
     if(this.input.up){
       if(this.status==="idol"||this.status==="backwalkbegin"||this.status==="backwalk"||this.status==="walkbegin"||this.status==="walk"||this.status==="dash"){
           this.object_ss.gotoAndPlay("jump");
-          statusupdate(this);
+          this.statusupdate();
           if(this.pre_status==="dash"){
             this.object_ss.currentFrameIndex=2;
-            statusupdate(this);
+            this.statusupdate();
           }
         }
     }
     if(this.input.down){
       if(this.status==="idol"||this.status==="backwalkbegin"||this.status==="backwalk"||this.status==="walkbegin"||this.status==="walk"){
         this.object_ss.gotoAndPlay("sitdown");
-        statusupdate(this);
+        this.statusupdate();
       }
       else if(this.status==="dash"){
         this.object_ss.gotoAndPlay("sit");
-        statusupdate(this);
+        this.statusupdate();
       }
     }
     if(this.input.a){
       //console.log("attack");
       if(this.status==="idol"||this.status==="walk"||this.status==="walkbegin"||this.status==="backwalk"||this.status==="backwalkbegin"){
         this.object_ss.gotoAndPlay("slash");
-        statusupdate(this);
+        this.statusupdate();
       }
       if(this.status==="dash"){
         this.object_ss.gotoAndPlay("slash");
-        statusupdate(this);
+        this.statusupdate();
       }
       if(this.status=="jump"&&this.frame<=2){
         this.object_ss.gotoAndPlay("jrslash");
-        statusupdate(this);
+        this.statusupdate();
       }
       if(this.status==="jump"&&2<this.frame&&this.frame<18&&this.jslash_count<3){
         this.jslash_count++;
         this.counter_hold=this.frame;
         this.object_ss.gotoAndPlay("jslash");
-        statusupdate(this);
+        this.statusupdate();
         this.s_shiftflag=false;
       }
       if(this.status=="sit"){
         this.object_ss.gotoAndPlay("sslash");
-        statusupdate(this);
+        this.statusupdate();
       }
     }
     //状態から動作を決定
@@ -1170,7 +1158,7 @@ phina.define("GameObject",{
       if(this.object.y>=0){
         this.object.y=0;
         this.object_ss.gotoAndPlay("shirimochi");
-        statusupdate(this);
+        this.statusupdate();
       }
     }
     if(this.status==="shirimochi"){
@@ -1322,59 +1310,72 @@ phina.define("GameObject",{
     },this);
     
   },
-  damage: function(owner){
-    function statusupdate(owner){
-      var tmp=owner.pre_status;
-      owner.pre_status = owner.status;
-      owner.status = owner.object_ss.currentAnimation.self;
-      if(owner.pre_status===owner.status){
-        owner.pre_status=tmp;
+  statusupdate: function(){
+      var tmp=this.pre_status;
+      this.pre_status = this.status;
+      this.status = this.object_ss.currentAnimation.self;
+      if(this.pre_status===this.status){
+        this.pre_status=tmp;
       }
-      owner.frame = owner.object_ss.currentFrameIndex;
+      this.frame = this.object_ss.currentFrameIndex;
       //console.log(owner.pre_status,owner.status);
-    }
-    if(this.status!="jdamage"||this.status!="jdamage_keep"){
-      if(this.status==="jump"||this.status==="jslash"||this.status==="jrslash"){
-        if(this.status==="jump"||this.status==="jrslash"){
-          this.s_shiftflag=false;
-          this.counter_hold=this.frame;
-          if(this.status==="jrslash"){
-            this.counter_hold+=3;
+    },
+  damage: function(owner){
+    
+    if(this.hitpoint != 0){
+      if(this.status!="jdamage"||this.status!="jdamage_keep"){
+        if(this.status==="jump"||this.status==="jslash"||this.status==="jrslash"){
+          if(this.status==="jump"||this.status==="jrslash"){
+            this.s_shiftflag=false;
+            this.counter_hold=this.frame;
+            if(this.status==="jrslash"){
+              this.counter_hold+=3;
+            }
           }
+          if(this.object.x < this.target.object.x)
+            this.direction="right";
+          else
+            this.direction="left";
+          this.object_ss.gotoAndPlay("jdamage");
+          this.statusupdate();
+          if(!this.sousai)
+            owner.jhitSE.play();
         }
-        if(this.object.x < this.target.object.x)
-          this.direction="right";
-        else
-          this.direction="left";
-        this.object_ss.gotoAndPlay("jdamage");
-        statusupdate(this);
-        if(!this.sousai)
-          owner.jhitSE.play();
+        else if(this.status==="sit"){
+          this.object_ss.gotoAndPlay("sdamage");
+          this.statusupdate();
+          if(!this.sousai)
+            owner.slashSE.play();
+        }
+        else if(this.status==="slash"&&this.target.status==="sslash"){
+          this.object_ss.gotoAndPlay("counterdamage");
+          this.statusupdate();
+          if(!this.sousai)
+            owner.chitSE.play();
+        }
+        else if(this.status==="sslash"&&this.target.status==="jrslash"){
+          this.object_ss.gotoAndPlay("counterdamage");
+          this.statusupdate();
+          if(!this.sousai)
+            owner.chitSE.play();
+        }
+        else{
+          this.object_ss.gotoAndPlay("damage");
+          this.statusupdate();
+          if(!this.sousai)
+            owner.slashSE.play();
+        }
       }
-      else if(this.status==="sit"){
-        this.object_ss.gotoAndPlay("sdamage");
-        statusupdate(this);
-        if(!this.sousai)
-          owner.slashSE.play();
-      }
-      else if(this.status==="slash"&&this.target.status==="sslash"){
-        this.object_ss.gotoAndPlay("counterdamage");
-        statusupdate(this);
-        if(!this.sousai)
-          owner.chitSE.play();
-      }
-      else if(this.status==="sslash"&&this.target.status==="jrslash"){
-        this.object_ss.gotoAndPlay("counterdamage");
-        statusupdate(this);
-        if(!this.sousai)
-          owner.chitSE.play();
-      }
-      else{
-        this.object_ss.gotoAndPlay("damage");
-        statusupdate(this);
-        if(!this.sousai)
-          owner.slashSE.play();
-      }
+    }
+    else{
+      this.s_shiftflag=false;
+      if(this.object.x < this.target.object.x)
+        this.direction="right";
+      else
+        this.direction="left";
+      this.object_ss.gotoAndPlay("jdamage");
+      this.statusupdate();
+      owner.todomeSE.play();
     }
   //console.log(this.status);
   }
@@ -1452,30 +1453,32 @@ phina.define("MainScene", {
     this.clist_c["root"] = GameConsole("root",null,["settings","exit"],this.m_center,120);
     var clists = [this.clist1,this.clist_c,this.clist2];
     var pointflag=true;
-    this.pcflag=false;
+    //this.pcflag=false;
     var conpstart = function(e){
-      var tl = e.interactive.app.touchList.touches;
-      if(this.getParent().getParent().visible&&tl.length==1){
-        pointflag=true;
-        clists.some(function(clist){
-            if(clist["root"].owner.alpha==1||clist["root"].owner.alpha==0.25){
-              pointflag=true;
-            }
-            else{
-              pointflag=false;
-              return true;
-            }
-          });
-        if(this.getParent().getParent().getParent().alpha==0.25&&pointflag){
-          this.getParent().getParent().getParent().tweener.clear().set({alpha: 0.26}).to({alpha: 1},200,"easeOutQuart");
-          clists.forEach(function(clist){
-            if(clist["root"].owner.alpha==1){
-              clist["root"].owner.tweener.clear().set({alpha: 0.99}).to({alpha: 0.25},200,"easeOutQuart");
-            }
-          });
-        }
-        else if(this.getParent().getParent().getParent().alpha==1&&pointflag){
-          this.pcflag=true;
+      if(!clists[0]["entry"].parent.visible&&!clists[2]["entry"].parent.visible){
+        var tl = e.interactive.app.touchList.touches;
+        if(this.getParent().getParent().visible&&tl.length==1){
+          pointflag=true;
+          clists.some(function(clist){
+              if(clist["root"].owner.alpha==1||clist["root"].owner.alpha==0.25){
+                pointflag=true;
+              }
+              else{
+                pointflag=false;
+                return true;
+              }
+            });
+          if(this.getParent().getParent().getParent().alpha==0.25&&pointflag){
+            this.getParent().getParent().getParent().tweener.clear().set({alpha: 0.26}).to({alpha: 1},200,"easeOutQuart");
+            clists.forEach(function(clist){
+              if(clist["root"].owner.alpha==1){
+                clist["root"].owner.tweener.clear().set({alpha: 0.99}).to({alpha: 0.25},200,"easeOutQuart");
+              }
+            });
+          }
+          else if(this.getParent().getParent().getParent().alpha==1&&pointflag){
+            this.pcflag=true;
+          }
         }
       }
     };
@@ -1537,6 +1540,34 @@ phina.define("MainScene", {
     this.ready = Sprite("ready").addChildTo(this.decolate);
     this.fight = Sprite("fight").addChildTo(this.decolate);
     
+    this.hitpoints = [RectangleShape({originX:0.5,originY:0,x:5+5,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:5+12,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:5+19,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:5+26,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:5+33,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:5+40,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:5+47,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:5+54,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:5+61,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:5+68,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)];
+    this.hitpoints.forEach(function(hp,i){
+      hp.hide();
+    },this);
+    
+    this.hitpoints2 = [RectangleShape({originX:0.5,originY:0,x:-5+SCREEN_WIDTH-5,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:-5+SCREEN_WIDTH-12,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:-5+SCREEN_WIDTH-19,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:-5+SCREEN_WIDTH-26,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:-5+SCREEN_WIDTH-33,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:-5+SCREEN_WIDTH-40,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:-5+SCREEN_WIDTH-47,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:-5+SCREEN_WIDTH-54,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:-5+SCREEN_WIDTH-61,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
+    ,RectangleShape({originX:0.5,originY:0,x:-5+SCREEN_WIDTH-68,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)];
+    this.hitpoints2.forEach(function(hp,i){
+      hp.hide();
+    },this);
+    
     this.decolate.hide();
     
     this.hanteilist = [];
@@ -1583,13 +1614,26 @@ phina.define("MainScene", {
     });
     this.fflag=false;
     this.pre_fflag=false;
+    this.dflag=false;
+    this.pre_dfalg=false;
   },
   
   // 更新
   update: function(app) {
     
     //console.log(this.clist1["root"].list.tweener.playing);
-    
+    var hpappear = function(i,owner){
+      if(i<10){
+        owner.hitpoints[i].show();
+        owner.hitpoints[i].tweener.clear().wait(100).call(hpappear,owner,[i+1,owner]);
+      }
+    };
+    var hpappear2 = function(i,owner){
+      if(i<10){
+        owner.hitpoints2[i].show();
+        owner.hitpoints2[i].tweener.clear().wait(100).call(hpappear2,owner,[i+1,owner]);
+      }
+    };
     function Collision(h1,h2){
       if(h1.x1<h2.x2&&h2.x1<h1.x2&&h1.y1<h2.y2&&h2.y1<h1.y2){
         return true;
@@ -1599,23 +1643,24 @@ phina.define("MainScene", {
     
     var clists = [this.clist1,this.clist_c,this.clist2];
     if(this.surface.visible){
-      if(app.keyboard.getKeyDown("right")){
-        clists.forEach(function(clist,i){
-          if(clist["root"].owner.alpha==1){
-            clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQuart");
-            clists[(i+1)%clists.length]["root"].owner.tweener.clear().to({alpha: 1},200,"easeOutQuart");
-          }
-        },this);
+      if(!this.clist1["entry"].parent.visible&&!this.clist2["entry"].parent.visible){
+        if(app.keyboard.getKeyDown("right")){
+          clists.forEach(function(clist,i){
+            if(clist["root"].owner.alpha==1){
+              clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQuart");
+              clists[(i+1)%clists.length]["root"].owner.tweener.clear().to({alpha: 1},200,"easeOutQuart");
+            }
+          },this);
+        }
+        else if(app.keyboard.getKeyDown("left")){
+          clists.forEach(function(clist,i){
+            if(clist["root"].owner.alpha==1){
+              clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQuart");
+              clists[(i-1)*(i-1<0?-(clists.length-1):1)]["root"].owner.tweener.clear().to({alpha: 1},200,"easeOutQuart");
+            }
+          },this);
+        }
       }
-      else if(app.keyboard.getKeyDown("left")){
-        clists.forEach(function(clist,i){
-          if(clist["root"].owner.alpha==1){
-            clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQuart");
-            clists[(i-1)*(i-1<0?-(clists.length-1):1)]["root"].owner.tweener.clear().to({alpha: 1},200,"easeOutQuart");
-          }
-        },this);
-      }
-      
       var conname;
       if(this.clist1["root"].owner.alpha==1){
         for(con in this.clist1){
@@ -1653,7 +1698,7 @@ phina.define("MainScene", {
     gos.push(this.player);
     gos.push(this.enemy);
     this.player.update(app.pointer,app.pointers,app.keyboard,this.fighters);
-    this.enemy.update(null,null,null,this.fighters);
+    this.enemy.update(app.pointer,app.pointers,app.keyboard,this.fighters);
     //this.player2.update();
     //this.enemy2.update();
     
@@ -1719,9 +1764,8 @@ phina.define("MainScene", {
               this.karaburiflag1_p=false;
               if(!this.player.hitflag&&this.enemy.hitpoint>0){
                 if(!this.player.sousai&&!this.enemy.demo){
+                  this.hitpoints2[this.enemy.hitpoint-1].hide();
                   this.enemy.hitpoint--;
-                  //HPreduce
-                  //console.log(this.enemy.hitpoint);
                 }
               this.enemy.damage(this);
               this.player.hitflag=true;
@@ -1749,8 +1793,8 @@ phina.define("MainScene", {
               this.karaburiflag1_e=false;
               if(!this.enemy.hitflag&&this.player.hitpoint>0){
                 if(!this.enemy.sousai&&!this.player.demo){
+                  this.hitpoints[this.player.hitpoint-1].hide();
                   this.player.hitpoint--;
-                  //HPreduce
                 }
               this.player.damage(this);
               this.enemy.hitflag=true;
@@ -1800,28 +1844,73 @@ phina.define("MainScene", {
     if(this.karaburiflag1_e)
       this.karaburiflag2_e=true;
     
+    
+    if((this.player.hitpoint==0||this.enemy.hitpoint==0)){
+      this.dflag=true;
+    }
+    if(this.dflag&&!this.pre_dflag){
+      this.decolate.tweener.clear().call(function(){
+        gos.forEach(function(go,i){
+          go.attackable=false;
+        });
+        app.fps=5;
+      }).wait(1000).call(function(){
+        app.fps=30;
+      }).wait(1000).call(function(){
+        gos.forEach(function(go,i){
+          go.hitpoint=10;
+          if(go.status=="dead"){
+            go.object_ss.gotoAndPlay("wakeup");
+            go.statusupdate();
+            this.fflag=true;
+          }
+          this.dflag=false;
+        },this);
+      },this);
+    }
     var clists2 = [this.clist1,this.clist2];
+    var controlobj = null;
     clists2.forEach(function(clist,i){
       if(clist["entry"].parent.visible){
         var obj=clist["entry"].controlobj;
         if(obj.mode=="standby"&&obj.status=="idol"&&obj.target.mode=="standby"&&obj.target.status=="idol"){
           this.fflag = true;
-          var controlobj = obj;
+          controlobj = obj;
         }
       }
     },this);
     if(this.fflag&&!this.pre_fflag){
       this.surface.hide();
       this.decolate.show();
+      
+      hpappear(0,this);
+      hpappear2(0,this);
       this.ready.show();
       this.fight.hide();
       this.readySE.play();
-      this.ready.tweener.clear().set({x: SCREEN_WIDTH/2,y:-18}).to();
-      //TODO
+      this.ready.tweener.clear().set({x: SCREEN_WIDTH/2,y: -18}).to({y: SCREEN_HEIGHT+18},1000,"easeOutInQuart").call(function(){
+        this.ready.hide();
+        this.fight.show();
+        this.decolate.tweener.clear().wait(100).call(function(){this.fightSE.play();},this);
+        this.fight.tweener.clear().set({x: SCREEN_WIDTH/2,y: -18}).to({y: SCREEN_HEIGHT+18},1000,"easeOutInQuart").call(function(){
+          this.fight.hide();
+          if(controlobj!=null){
+            controlobj.inputable=true;
+            controlobj.demo=false;
+            controlobj.target.mode="safe";
+            controlobj.target.demo=false;
+          }
+          gos.forEach(function(go,i){
+            go.attackable=true;
+          });
+          this.fflag=false;
+        },this);
+      },this);
     }
     //console.log(this.enemy.mode,this.enemy.sitcounter,this.enemy.sit,this.enemy.input.down);
      //console.log(app.canvas.miterLimit);
-     this.pre_fflag=this.fflag;
+ this.pre_fflag=this.fflag;
+ this.pre_dflag=this.dflag;
   }
 });
 
@@ -1836,11 +1925,11 @@ phina.main(function() {
     height: SCREEN_HEIGHT,// 画面高さ
     assets: ASSETS,       // アセット読み込み
   });
-  app.enableStats();
+  //app.enableStats();
   
   // 実行
   app.run();
-});
-</script>
+});</script>
   </body>
 </html>
+
