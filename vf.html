@@ -68,6 +68,12 @@ h1 {
 document.addEventListener('touchmove', function(evt) {
     evt.preventDefault();
 });
+document.addEventListener('touchstart', function(evt) {
+    evt.preventDefault();
+});
+document.addEventListener('touchend', function(evt) {
+    evt.preventDefault();
+});
 // グローバルに展開
 phina.globalize();
 // 定数
