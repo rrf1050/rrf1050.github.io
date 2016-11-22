@@ -1,4 +1,4 @@
-
+<!doctype html>
  
 <html>
   <head>
@@ -12,16 +12,8 @@ http://rrfgames.sitemix.jp/vf.html
 をphina.jsに移植してみようとサンプルからフォークして作っています。" />
     
     <style>*, *:before, *:after {
+  box-sizing: border-box; 
     overflow-y: hidden;
-    overflow-x: hidden;
-    -webkit-touch-callout: none;
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
--o-user-select: none;
-user-select: none;
-user-scalable: no;
 }
 canvas{
   image-rendering: -moz-crisp-edges;         /* Firefox */
@@ -30,30 +22,15 @@ canvas{
   image-rendering: crisp-edges;
   -ms-interpolation-mode: nearest-neighbor;  /* IE (非標準プロパティ) */
   image-rendering: pixelated;
-  scrolling: no;
-	height: window.innerHeight;
-    -webkit-touch-callout: none;
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
--o-user-select: none;
-user-select: none;
--webkit-tap-highlight-color: rgba(0,0,0,0); 
 }
 html {
   font-size: 62.5%;
 
 }
 body {
+  width: 100%;
   color: #444;
-  -webkit-touch-callout: none;
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
--o-user-select: none;
-user-select: none;
+  background-color: hsl(0, 0%, 96%);
 }
 h1 {
   font-size: 1.8rem;
@@ -61,23 +38,10 @@ h1 {
 
   </style>
   </head>
-  <body unselectable="on">
-<script src="https://rawgit.com/rrf1050/test/master/build/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
-
-   <script src="https://rawgit.com/rrf1050/test/master/build/phina.js" crossorigin="anonymous"></script>
-    
+  <body>
+   <script src="https://rawgit.com/rrf1050/test/master/build/phina.js" crossorigin="anonymous"></script> 
    <!--<script src="http://cdn.rawgit.com/phi-jp/phina.js/v0.2.0/build/phina.js"></script> !-->
     <script>//console.log(Math.pow(2,0.5));
-document.addEventListener('touchmove', function(e) {
-    
-},{passive:true});
-/*
-document.addEventListener('touchstart', function(evt) {
-    evt.preventDefault();
-});
-document.addEventListener('touchend', function(evt) {
-    evt.preventDefault();
-});*/
 // グローバルに展開
 phina.globalize();
 // 定数
@@ -1520,29 +1484,30 @@ phina.define("MainScene", {
     };
     var conpmove = function(e){
       if(this.getParent().getParent().visible&&this.pcflag){
-        if(-6<=this.getParent().y&&this.getParent().y<=6){
+        if(-6<this.getParent().y&&this.getParent().y<6){
           this.getParent().moveBy(0,e.pointer.deltaPosition.y);
         }
-        else if(this.getParent().y<-6){
-          this.getParent().y=-7;
+        if(this.getParent().y<=-6){
+          this.getParent().y=-6;
         }
-        else{
-          this.getParent().y=7;
+        else if(this.getParent().y>=6){
+          this.getParent().y=6;
         }
       }
     }
     var conpend = function(e){
       if(this.getParent().getParent().visible&&this.pcflag){
         this.pcflag=false;
-        if(this.getParent().y<-6||6<this.getParent().y){
-          if(this.getParent().y<-6){
+        if(this.getParent().y<=-6||6<=this.getParent().y){
+          if(this.getParent().y<=-6){
             this.downflag=true;
           }
           else{
             this.upflag=true;
           }
         }
-        else if(this.getParent().y==0){
+        else if(-1<=this.getParent().y&&this.getParent().y<=1){
+          this.getParent().tweener.clear().to({y: 0},100,"easeOutQuart");
           this.enterflag=true;
         }
         else{
@@ -1652,13 +1617,11 @@ phina.define("MainScene", {
     this.pre_fflag=false;
     this.dflag=false;
     this.pre_dfalg=false;
-    
-    //this.plog = Label({x:SCREEN_WIDTH/2,y:SCREEN_HEIGHT/2,text:"test"}).addChildTo(this);
   },
   
   // 更新
   update: function(app) {
-    //this.plog.text = "x:"+Math.floor(app.pointer.x)+"y:"+Math.floor(app.pointer.y);
+    
     //console.log(this.clist1["root"].list.tweener.playing);
     var hpappear = function(i,owner){
       if(i<10){
@@ -1963,10 +1926,11 @@ phina.main(function() {
     height: SCREEN_HEIGHT,// 画面高さ
     assets: ASSETS,       // アセット読み込み
   });
-  app.enableStats();
+  //app.enableStats();
   
   // 実行
   app.run();
 });</script>
   </body>
 </html>
+
