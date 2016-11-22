@@ -21,6 +21,7 @@ http://rrfgames.sitemix.jp/vf.html
 -ms-user-select: none;
 -o-user-select: none;
 user-select: none;
+user-scalable: no;
 }
 canvas{
   image-rendering: -moz-crisp-edges;         /* Firefox */
@@ -62,11 +63,13 @@ h1 {
   </head>
   <body unselectable="on">
 <script src="https://rawgit.com/rrf1050/test/master/build/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
-   <script src="https://rawgit.com/rrf1050/test/master/build/phina.js" crossorigin="anonymous"></script> 
+
+   <script src="https://rawgit.com/rrf1050/test/master/build/phina.js" crossorigin="anonymous"></script>
+    
    <!--<script src="http://cdn.rawgit.com/phi-jp/phina.js/v0.2.0/build/phina.js"></script> !-->
     <script>//console.log(Math.pow(2,0.5));
-document.addEventListener('touchmove', function(evt) {
-    if (!$('.scrollable').has($(e.target)).length) e.preventDefault();
+document.addEventListener('touchmove', function(e) {
+    
 },{passive:true});
 /*
 document.addEventListener('touchstart', function(evt) {
@@ -1649,11 +1652,13 @@ phina.define("MainScene", {
     this.pre_fflag=false;
     this.dflag=false;
     this.pre_dfalg=false;
+    
+    //this.plog = Label({x:SCREEN_WIDTH/2,y:SCREEN_HEIGHT/2,text:"test"}).addChildTo(this);
   },
   
   // 更新
   update: function(app) {
-    
+    //this.plog.text = "x:"+Math.floor(app.pointer.x)+"y:"+Math.floor(app.pointer.y);
     //console.log(this.clist1["root"].list.tweener.playing);
     var hpappear = function(i,owner){
       if(i<10){
@@ -1958,7 +1963,7 @@ phina.main(function() {
     height: SCREEN_HEIGHT,// 画面高さ
     assets: ASSETS,       // アセット読み込み
   });
-  //app.enableStats();
+  app.enableStats();
   
   // 実行
   app.run();
