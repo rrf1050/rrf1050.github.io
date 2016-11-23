@@ -9,5 +9,6 @@ console.log('Server running!');
 function doRequest(req, res) {
     res.writeHead(200, {'Content-Type': 'text/plain'});
     res.write('Hello World\n');
+		res.write(os.tmpdir());
     res.end();
 }
