@@ -1,6 +1,7 @@
 var http = require('http');
  
 var server = http.createServer();
+const os = require('os');
 server.on('request', doRequest);
 server.listen(process.env.PORT, process.env.IP);
 console.log('Server running!');
