@@ -14,6 +14,7 @@ http://rrfgames.sitemix.jp/vf.html
     <style>*, *:before, *:after {
   box-sizing: border-box; 
     overflow-y: hidden;
+     overflow-x: hidden;
 }
 canvas{
   image-rendering: -moz-crisp-edges;         /* Firefox */
@@ -39,6 +40,7 @@ h1 {
   </style>
   </head>
   <body>
+   
    <script src="https://rawgit.com/rrf1050/test/master/build/phina.js" crossorigin="anonymous"></script> 
    <!--<script src="http://cdn.rawgit.com/phi-jp/phina.js/v0.2.0/build/phina.js"></script> !-->
     <script>//console.log(Math.pow(2,0.5));
@@ -74,9 +76,35 @@ var ASSETS = {
     origin: "https://rawgit.com/rrf1050/test/master/graphic/surface/Origin.png",
     legacy: "https://rawgit.com/rrf1050/test/master/graphic/surface/Legacy.png",
     white: "https://rawgit.com/rrf1050/test/master/graphic/surface/White.png",
+    settings_t: "https://rawgit.com/rrf1050/test/master/graphic/settings/settings_t.png",
+    game_settings: "https://rawgit.com/rrf1050/test/master/graphic/settings/game_settings.png",
+    sound_settings: "https://rawgit.com/rrf1050/test/master/graphic/settings/sound_settings.png",
+    back_s: "https://rawgit.com/rrf1050/test/master/graphic/settings/back_s.png",
+    game_settings_t:"https://rawgit.com/rrf1050/test/master/graphic/settings/game_settings_t.png",
+    game_num:"https://rawgit.com/rrf1050/test/master/graphic/settings/game_num.png",
+    deuce:"https://rawgit.com/rrf1050/test/master/graphic/settings/deuce.png",
+    cpu_vs_cpu:"https://rawgit.com/rrf1050/test/master/graphic/settings/cpu_vs_cpu.png",
+    gn1:"https://rawgit.com/rrf1050/test/master/graphic/settings/gn1.png",
+    gn2:"https://rawgit.com/rrf1050/test/master/graphic/settings/gn2.png",
+    gn3:"https://rawgit.com/rrf1050/test/master/graphic/settings/gn3.png",
+    gn4:"https://rawgit.com/rrf1050/test/master/graphic/settings/gn4.png",
+    gn5:"https://rawgit.com/rrf1050/test/master/graphic/settings/gn5.png",
+    on: "https://rawgit.com/rrf1050/test/master/graphic/settings/on.png",
+    off:"https://rawgit.com/rrf1050/test/master/graphic/settings/off.png",
+    sound_settings_t:"https://rawgit.com/rrf1050/test/master/graphic/settings/sound_settings_t.png",
+    se:"https://rawgit.com/rrf1050/test/master/graphic/settings/se.png",
+    bgm:"https://rawgit.com/rrf1050/test/master/graphic/settings/bgm.png",
+    cursor: "https://rawgit.com/rrf1050/test/master/graphic/settings/cursor.png",
+    exit_message:"https://rawgit.com/rrf1050/test/master/graphic/exit/exit_message.png",
+    yes: "https://rawgit.com/rrf1050/test/master/graphic/exit/yes.png",
+    no: "https://rawgit.com/rrf1050/test/master/graphic/exit/no.png",
     
     ready: "https://rawgit.com/rrf1050/test/master/graphic/decolate/Ready.png",
     fight: "https://rawgit.com/rrf1050/test/master/graphic/decolate/Fight.png",
+    you_r: "https://rawgit.com/rrf1050/test/master/graphic/decolate/you_r.png",
+    you_b: "https://rawgit.com/rrf1050/test/master/graphic/decolate/you_b.png",
+    win: "https://rawgit.com/rrf1050/test/master/graphic/decolate/win.png",
+    lose: "https://rawgit.com/rrf1050/test/master/graphic/decolate/lose.png",
   },
 	spritesheet: {
 		"yukari_legacy_ss":"https://rawgit.com/rrf1050/test/master/ss/yukari25_c16.json",
@@ -121,6 +149,11 @@ var ASSETS = {
 	  ready: 'https://rawgit.com/rrf1050/test/master/se/ready.wav',
 	  slash: 'https://rawgit.com/rrf1050/test/master/se/slash.wav',
 	  todome: 'https://rawgit.com/rrf1050/test/master/se/todome.wav',
+	  
+	  lobby: 'https://rawgit.com/rrf1050/test/master/bgm/c13.mp3',
+	  battle: "https://rawgit.com/rrf1050/test/master/bgm/n51.mp3",
+	  win: 'https://rawgit.com/rrf1050/test/master/bgm/win.mp3',
+	  lose: 'https://rawgit.com/rrf1050/test/master/bgm/lose.mp3',
 	}
 };
 
@@ -143,54 +176,262 @@ phina.define("GameInput",{
 phina.define("GameConsole",{
   
   init: function(name,parentname,elements,owner,x,controlobj){
-    var y = 110;
-    var y_offset = 12;
-    
-    this.controlobj = controlobj;
-    this.keyqueue=[];
-    this.name = name;
-    this.parentname = parentname;
-    this.elements = elements;
-    this.objects = [];
-    this.owner = owner;
-    this.parent = DisplayElement().addChildTo(owner);
-    this.parent.clip = function(canvas){
-      canvas.beginPath();
-      canvas.rect(x-25,102,52,25);
-    };
-    this.list = DisplayElement().addChildTo(this.parent);
-    this.dummy = DisplayElement().addChildTo(this.list);
-    this.dummy.origin.set(0.5,0);
-    this.dummy.x=x;
-    this.dummy.y=102;
-    this.dummy.width=52;
-    this.dummy.height=25;
-    
-    this.dummy.enterflag=false;
-    this.dummy.upflag=false;
-    this.dummy.downflag=false;
-    
-    if(this.name != "entry"){
-      Math.floor(5/elements.length+1).times(function(){
-        elements.forEach(function(element){
-          var sprite = Sprite(element).addChildTo(this.list);
-          sprite.origin.set(0.5,0);
-          sprite.x = x;
-          sprite.y = 0;
-          this.objects.push(sprite);
+    if(!name.match("settings")&&name!="exit"){
+      var y = 110;
+      var y_offset = 12;
+      
+      this.controlobj = controlobj;
+      this.keyqueue=[];
+      this.name = name;
+      this.parentname = parentname;
+      this.elements = elements;
+      this.objects = [];
+      this.owner = owner;
+      this.parent = DisplayElement().addChildTo(owner);
+      this.parent.clip = function(canvas){
+        canvas.beginPath();
+        canvas.rect(x-25,102,52,25);
+      };
+      this.list = DisplayElement().addChildTo(this.parent);
+      this.dummy = DisplayElement().addChildTo(this.list);
+      this.dummy.origin.set(0.5,0);
+      this.dummy.x=x;
+      this.dummy.y=102;
+      this.dummy.width=52;
+      this.dummy.height=25;
+      
+      this.dummy.enterflag=false;
+      this.dummy.upflag=false;
+      this.dummy.downflag=false;
+      
+      if(this.name != "entry"){
+        Math.floor(5/elements.length+1).times(function(){
+          elements.forEach(function(element){
+            var sprite = Sprite(element).addChildTo(this.list);
+            sprite.origin.set(0.5,0);
+            sprite.x = x;
+            sprite.y = 0;
+            this.objects.push(sprite);
+          },this);
         },this);
+        this.objects[0].y=y;
+        this.objects[1].y=y+y_offset;
+        this.objects[2].y=y+y_offset*2;
+        this.objects[this.objects.length-1].y=y-y_offset;
+        this.objects[this.objects.length-2].y=y-y_offset*2;
+      }
+    }
+    else if(name.match("settings")){
+      this.controlobj=controlobj;
+      this.name = name;
+      this.parentname = parentname;
+      this.elements = elements;
+      this.objects = [];
+      this.owner = owner;
+      this.parent = DisplayElement().addChildTo(owner);
+      this.board = DisplayElement().addChildTo(this.parent);
+      this.board.enterflag=false;
+      this.board.Iterator=0;
+      if(this.name=="settings"){
+        this.board.x = -SCREEN_WIDTH;
+        this.board.y = -SCREEN_HEIGHT;
+      }
+      else{
+        this.board.x = SCREEN_WIDTH/2;
+        this.board.y = SCREEN_HEIGHT/2;
+      }
+      this.backrect = RectangleShape({width:SCREEN_WIDTH*3/4,height:SCREEN_HEIGHT*3/4,fill:"#000",stroke:"false"}).addChildTo(this.board);
+      this.title = Sprite(elements[0]).addChildTo(this.board);
+      this.title.y= -SCREEN_HEIGHT/4;
+      elements.shift();
+      elements.forEach(function(element,i){
+        var sprite = Sprite(element).addChildTo(this.board);
+        sprite.y = SCREEN_HEIGHT*i/(elements.length*2)-10;
+        if(this.name != "settings" && element != "back_s"){
+          sprite.originX = 0;
+          sprite.x = -50;
+        }
+        this.objects.push(sprite);
       },this);
-      this.objects[0].y=y;
-      this.objects[1].y=y+y_offset;
-      this.objects[2].y=y+y_offset*2;
-      this.objects[this.objects.length-1].y=y-y_offset;
-      this.objects[this.objects.length-2].y=y-y_offset*2;
+      if(this.name == "game_settings"){
+        this.gns = [];
+        (5).times(function(i){
+          var sprite = Sprite("gn"+String(i+1)).addChildTo(this.board);
+          sprite.y = -10;
+          sprite.x = 50;
+          sprite.hide();
+          if(i+1==this.controlobj.gn)
+            sprite.show();
+          this.gns.push(sprite);
+        },this);
+        this.on_d = Sprite("on").addChildTo(this.board);
+        this.on_d.x = 50;
+        this.on_d.y = SCREEN_HEIGHT*1/(elements.length*2)-10;
+        this.off_d = Sprite("off").addChildTo(this.board);
+        this.off_d.x = 50;
+        this.off_d.y = SCREEN_HEIGHT*1/(elements.length*2)-10;
+        if(this.controlobj.deuce){
+          this.on_d.show();
+          this.off_d.hide();
+        }
+        else{
+          this.on_d.hide();
+          this.off_d.show();
+        }
+        this.on_cvc = Sprite("on").addChildTo(this.board);
+        this.on_cvc.x = 50;
+        this.on_cvc.y = SCREEN_HEIGHT*2/(elements.length*2)-10;
+        this.off_cvc = Sprite("off").addChildTo(this.board);
+        this.off_cvc.x = 50;
+        this.off_cvc.y = SCREEN_HEIGHT*2/(elements.length*2)-10;
+        if(this.controlobj.cpu_vs_cpu){
+          this.on_cvc.show();
+          this.off_cvc.hide();
+        }
+        else{
+          this.on_cvc.hide();
+          this.off_cvc.show();
+        }
+      }
+      if(this.name == "sound_settings"){
+        this.segage = RectangleShape({originX:0,x:-25,y:-10,fill:"#fff",stroke:false,width:100,height:10}).addChildTo(this.board);
+        this.segage_dummy = DisplayElement({originX:0,width:100,height:10}).addChildTo(this.segage);
+        this.bgmgage = RectangleShape({originX:0,x:-25,y:SCREEN_HEIGHT*1/(elements.length*2)-10,fill:"#fff",stroke:false,width:100,height:10}).addChildTo(this.board);
+        this.bgmgage_dummy = DisplayElement({originX:0,width:100,height:10}).addChildTo(this.bgmgage);
+      }
+      if(!phina.isMobile()){
+        this.cursor = Sprite("cursor").addChildTo(this.board);
+        this.Iterator = 0;
+        if(this.name == "settings")
+          this.cursor.x = -this.objects[this.Iterator].width/2-10;
+        else
+          this.cursor.x = this.objects[this.Iterator].x -10;
+        this.cursor.y = this.objects[this.Iterator].y;
+      }
+      this.backrect.alpha=0.5;
+      this.openflag=false;
+      this.pre_visible=false;
+      if(this.name != "settings"){
+        this.pre_visible=true;
+        this.openflag=true;
+      }
+      if(this.name=="settings"){
+        this.objects.forEach(function(obj,i){
+          obj.setInteractive(true);
+          obj.onpointend = function(){
+            if(this.getParent().getParent().visible){
+              this.getParent().enterflag = true;
+              this.getParent().Iterator = i;
+            }
+          };
+        },this);
+      }
+      else if(this.name == "game_settings"){
+        this.dummies=[];
+        (3).times(function(i){
+          var de = DisplayElement({originX:0,x:this.objects[i].x,y:this.objects[i].y,width:110,height:this.objects[i].height}).addChildTo(this.board);
+          de.setInteractive(true);
+          de.onpointend = function(){
+            if(this.getParent().getParent().visible){
+              this.getParent().enterflag = true;
+              this.getParent().Iterator = i;
+            }
+          }
+          this.dummies.push(de);
+        },this);
+        this.objects[this.objects.length-1].setInteractive(true);
+        var last = this.objects.length-1;
+        this.objects[this.objects.length-1].onpointend = function(){
+          if(this.getParent().getParent().visible){
+              this.getParent().enterflag = true;
+              this.getParent().Iterator = last;
+            }
+        }
+      }
+      else if(this.name=="sound_settings"){
+        var gagemove =function(e){
+          var x = Math.floor(e.pointer.position.x);
+          var width=0;
+          if(x<95){
+            width=0;
+          }
+          else if(x<=195){
+            width = x-95;
+          }
+          else{
+            width = 100;
+          }
+          this.getParent().width = width;
+          
+        };
+        this.segage_dummy.setInteractive(true);
+        this.segage_dummy.onpointmove = gagemove;
+        this.bgmgage_dummy.setInteractive(true);
+        this.bgmgage_dummy.onpointmove = gagemove;
+        this.objects[this.objects.length-1].setInteractive(true);
+        var last = this.objects.length-1;
+        this.objects[this.objects.length-1].onpointend = function(){
+          if(this.getParent().getParent().visible){
+              this.getParent().enterflag = true;
+              this.getParent().Iterator = last;
+            }
+        }
+      }
+    }
+    else {//name == exit
+      this.controlobj=controlobj;
+      this.name = name;
+      this.parentname = parentname;
+      this.elements = elements;
+      this.objects = [];
+      this.dummies = [];
+      this.owner = owner;
+      this.parent = DisplayElement().addChildTo(owner);
+      this.board = DisplayElement().addChildTo(this.parent);
+      this.board.enterflag=false;
+      this.board.Iterator=0;
+      this.board.x = -SCREEN_WIDTH;
+      this.board.y = -SCREEN_HEIGHT;
+      this.backrect = RectangleShape({width:SCREEN_WIDTH*3/4,height:SCREEN_HEIGHT*2/5,fill:"#000",stroke:"false"}).addChildTo(this.board);
+      this.title = Sprite(elements[0]).addChildTo(this.board);
+      this.title.y= -SCREEN_HEIGHT/8;
+      elements.shift();
+      elements.forEach(function(element,i){
+        var sprite = Sprite(element).addChildTo(this.board);
+        sprite.y = SCREEN_HEIGHT/8;
+        sprite.x = SCREEN_WIDTH*(i*2-1)/(elements.length*3);
+        var dummy = DisplayElement({x:sprite.x,y:sprite.y,width:sprite.width*2,height:sprite.height*2}).addChildTo(this.board);
+        this.objects.push(sprite);
+        this.dummies.push(dummy);
+      },this);
+      if(!phina.isMobile()){
+        this.cursor = Sprite("cursor").addChildTo(this.board);
+        this.Iterator = 1;
+        if(this.name == "settings")
+          this.cursor.x = -this.objects[this.Iterator].width/2-10;
+        else
+          this.cursor.x = this.objects[this.Iterator].x -20;
+        this.cursor.y = this.objects[this.Iterator].y;
+      }
+      this.dummies.forEach(function(dummy,i){
+        dummy.setInteractive(true);
+        dummy.onpointend = function(){
+          if(this.getParent().getParent().visible){
+            this.getParent().enterflag=true;
+            this.getParent().Iterator = i;
+          }
+        }
+      },this);
+      this.backrect.alpha=0.5;
+      this.openflag=false;
+      this.pre_visible=false;
     }
   },
   update: function(pointer,keyboard,owner){
     
     var y = 110;
     var y_offset = 12;
+    if(!this.name.match("settings")&&this.name!="exit"){
     if(this.name!="entry"){
       if(!phina.isMobile()){
         
@@ -259,6 +500,177 @@ phina.define("GameConsole",{
         this.controlobj.target.mode="safe";
         return this.parentname;
       }
+      return this.name;
+    }
+    }
+    else if(this.name.match("settings")){
+      if(!this.pre_visible){
+        this.board.tweener.clear().set({
+          x:SCREEN_WIDTH/2,y:120,scaleX:0.1,scaleY:0.1
+        }).to({
+          x:SCREEN_WIDTH/2,y:SCREEN_HEIGHT/2,scaleX:1,scaleY:1
+        },500,"easeOutQuart").call(function(){
+          this.openflag=true;
+        },this);
+      }
+      if(this.openflag){
+        if(this.name == "game_settings"){
+          if(this.controlobj.gn == 1){
+            this.controlobj.deuce = false;
+          }
+          if(this.controlobj.deuce){
+            this.on_d.show();
+            this.off_d.hide();
+          }
+          else{
+            this.on_d.hide();
+            this.off_d.show();
+          }
+        }
+        if(this.name == "sound_settings"){
+          this.controlobj.se = this.segage.width/100;
+          this.controlobj.SEpool.forEach(function(_se){
+            _se.volume = 0.15*this.controlobj.se;
+          },this);
+          this.controlobj.bgm = this.bgmgage.width/100;
+           this.controlobj.BGMpool.forEach(function(_bgm){
+            _bgm.volume = 0.2*this.controlobj.bgm;
+          },this);
+        }
+        if(!phina.isMobile()){
+          if(keyboard.getKeyDown("up")){
+            this.Iterator = (this.Iterator-1<0) ?  this.objects.length-1:this.Iterator-1;
+            if(this.name == "settings")
+              this.cursor.x = -this.objects[this.Iterator].width/2-10;
+            else if(this.Iterator == this.objects.length-1)
+              this.cursor.x = -this.objects[this.Iterator].width/2-10;
+            else
+              this.cursor.x = this.objects[this.Iterator].x -10;
+            this.cursor.y = this.objects[this.Iterator].y;
+          }
+          else if(keyboard.getKeyDown("down")){
+            this.Iterator = (this.Iterator+1>this.objects.length-1) ?  0 :this.Iterator+1;
+            if(this.name == "settings")
+              this.cursor.x = -this.objects[this.Iterator].width/2-10;
+            else if(this.Iterator == this.objects.length-1)
+              this.cursor.x = -this.objects[this.Iterator].width/2-10;
+            else
+              this.cursor.x = this.objects[this.Iterator].x -10;
+            this.cursor.y = this.objects[this.Iterator].y;
+          }
+          if(keyboard.getKey("left")&&this.name=="sound_settings"){
+            if(this.Iterator == 0){
+              this.controlobj.se = (this.controlobj.se-0.01<0) ? 0 : this.controlobj.se-0.01;
+              this.controlobj.SEpool.forEach(function(_se){
+                _se.volume = 0.15*this.controlobj.se;
+              },this);
+              this.segage.width=100*this.controlobj.se;
+            }
+            else if(this.Iterator == 1){
+              this.controlobj.bgm = (this.controlobj.bgm-0.01<0) ? 0 : this.controlobj.bgm-0.01;
+              this.controlobj.BGMpool.forEach(function(_bgm){
+                _bgm.volume = 0.2*this.controlobj.bgm;
+              },this);
+              this.bgmgage.width=100*this.controlobj.bgm;
+            }
+          }
+          else if(keyboard.getKey("right")&&this.name=="sound_settings"){
+            if(this.Iterator == 0){
+              this.controlobj.se = (this.controlobj.se+0.01>1) ? 1 : this.controlobj.se+0.01;
+              this.controlobj.SEpool.forEach(function(_se){
+                _se.volume = 0.15*this.controlobj.se;
+              },this);
+              this.segage.width=100*this.controlobj.se;
+            }
+            else if(this.Iterator == 1){
+              this.controlobj.bgm = (this.controlobj.bgm+0.01>1) ? 1 : this.controlobj.bgm+0.01;
+              this.controlobj.BGMpool.forEach(function(_bgm){
+                _bgm.volume = 0.2*this.controlobj.bgm;
+              },this);
+              this.bgmgage.width=100*this.controlobj.bgm;
+            }
+          }
+          if(keyboard.getKeyDown("z")){
+            var ret = this.enter(owner);
+            return ret;
+          }
+          else if(keyboard.getKeyDown("x")){
+            this.Iterator=0;
+            if(this.name == "settings")
+              this.cursor.x = -this.objects[this.Iterator].width/2-10;
+            else if(this.Iterator == this.objects.length-1)
+              this.cursor.x = -this.objects[this.Iterator].width/2-10;
+            else
+              this.cursor.x = this.objects[this.Iterator].x -10;
+            this.cursor.y = this.objects[this.Iterator].y;
+            if(this.name=="settings"){
+              this.openflag=false;
+              this.pre_visible = false;
+              this.board.x = -SCREEN_WIDTH;
+              this.board.y = -SCREEN_HEIGHT;
+            }
+            return this.parentname;
+          }
+        }
+        else{
+          if(this.board.enterflag){
+            this.board.enterflag=false;
+            this.Iterator = this.board.Iterator;
+            var ret = this.enter(owner);
+            return ret;
+          }
+        }
+      }
+      this.pre_visible = this.parent.visible;
+      return this.name;
+    }
+    else{//this.name==exit
+      if(!this.pre_visible){
+        this.board.tweener.clear().set({
+          x:SCREEN_WIDTH/2,y:120,scaleX:0.1,scaleY:0.1
+        }).to({
+          x:SCREEN_WIDTH/2,y:SCREEN_HEIGHT/2,scaleX:1,scaleY:1
+        },500,"easeOutQuart").call(function(){
+          this.openflag=true;
+        },this);
+      }
+      if(this.openflag){
+        if(!phina.isMobile()){
+          if(keyboard.getKeyDown("left")){
+            this.Iterator = this.Iterator-1<0 ? this.objects.length-1 : this.Iterator-1;
+            this.cursor.x = this.objects[this.Iterator].x -20;
+            this.cursor.y = this.objects[this.Iterator].y;
+          }
+          else if(keyboard.getKeyDown("right")){
+            this.Iterator = this.Iterator+1>this.objects.length-1 ? 0 : this.Iterator+1;
+            this.cursor.x = this.objects[this.Iterator].x -20;
+            this.cursor.y = this.objects[this.Iterator].y;
+          }
+          if(keyboard.getKeyDown("z")){
+            var ret = this.enter(owner);
+            return ret;
+          }
+          else if(keyboard.getKeyDown("x")){
+            this.Iterator=1;
+            this.cursor.x = this.objects[this.Iterator].x -20;
+            this.cursor.y = this.objects[this.Iterator].y;
+            this.openflag=false;
+            this.pre_visible = false;
+            this.board.x = -SCREEN_WIDTH;
+            this.board.y = -SCREEN_HEIGHT;
+            return this.parentname;
+          }
+        }
+        else{
+          if(this.board.enterflag){
+            this.board.enterflag=false;
+            this.Iterator = this.board.Iterator;
+            var ret = this.enter(owner);
+            return ret;
+          }
+        }
+      }
+      this.pre_visible = this.parent.visible;
       return this.name;
     }
   },
@@ -381,7 +793,132 @@ phina.define("GameConsole",{
             //TODO
             break;
         }
+        break;
+      case "settings":
+        switch(this.objects[this.Iterator].name){
+          case "back_s":
+            this.openflag=false;
+            this.pre_visible = false;
+            this.board.x = -SCREEN_WIDTH;
+            this.board.y = -SCREEN_HEIGHT;
+            this.Iterator=0;
+            if(!phina.isMobile()){
+              this.cursor.x = -this.objects[this.Iterator].width/2-10;
+              this.cursor.y = this.objects[this.Iterator].y;
+            }
+            return this.parentname;
+          default:
+            return this.objects[this.Iterator].name;
+        }
+        break;
+      case "game_settings":
+        switch(this.objects[this.Iterator].name){
+          case "back_s":
+            this.Iterator=0;
+            if(!phina.isMobile()){
+              this.cursor.x = this.objects[this.Iterator].x -10;
+              this.cursor.y = this.objects[this.Iterator].y;
+            }
+            return this.parentname;
+          case "game_num":
+            owner.gn = (owner.gn + 1) > 5 ? 1 : owner.gn + 1;
+            this.gns.forEach(function(gn){
+              gn.hide();
+            });
+            this.gns[owner.gn-1].show();
+            return this.name;
+          case "deuce":
+            if(owner.gn != 1){
+              if(owner.deuce)
+                owner.deuce=false;
+              else
+                owner.deuce=true;
+              if(owner.deuce){
+                this.on_d.show();
+                this.off_d.hide();
+              }
+              else{
+                this.on_d.hide();
+                this.off_d.show();
+              }
+            }
+            return this.name;
+          case "cpu_vs_cpu":
+            if(owner.cpu_vs_cpu)
+              owner.cpu_vs_cpu=false;
+            else
+              owner.cpu_vs_cpu=true;
+            if(owner.cpu_vs_cpu){
+              this.on_cvc.show();
+              this.off_cvc.hide();
+            }
+            else{
+              this.on_cvc.hide();
+              this.off_cvc.show();
+            }
+            return this.name;
+        }
+        break;
+      case "sound_settings":
+        switch(this.objects[this.Iterator].name){
+          case "back_s":
+            this.Iterator=0;
+            if(!phina.isMobile()){
+              this.cursor.x = this.objects[this.Iterator].x -10;
+              this.cursor.y = this.objects[this.Iterator].y;
+            }
+            return this.parentname;
+          case "bgm":
+            owner.bgm = (owner.bgm + 0.1) > 1 ? 1 : owner.bgm + 0.1;
+            owner.BGMpool.forEach(function(bgm){
+              bgm.volume = 0.2*owner.bgm;
+            });
+            this.bgmgage.width = owner.bgm*100;
+            return this.name;
+          case "se":
+            owner.se = (owner.se + 0.1) > 1 ? 1 : owner.se + 0.1;
+            owner.SEpool.forEach(function(se){
+              se.volume = 0.15*owner.se;
+            });
+            this.segage.width = owner.se*100;
+            return this.name;
+          case "cpu_vs_cpu":
+            if(owner.cpu_vs_cpu)
+              owner.cpu_vs_cpu=false;
+            else
+              owner.cpu_vs_cpu=true;
+            if(owner.cpu_vs_cpu){
+              this.on_cvc.show();
+              this.off_cvc.hide();
+            }
+            else{
+              this.on_cvc.hide();
+              this.off_cvc.show();
+            }
+            return this.name;
+        }
+        break;
+      case "exit":
+        switch(this.objects[this.Iterator].name){
+          case "yes":
+            owner.lobbyBGM.stop();
+            owner.exit();
+            return this.name;
+          case "no":
+            this.Iterator=1;
+            if(!phina.isMobile()){
+              this.cursor.x = this.objects[this.Iterator].x -20;
+              this.cursor.y = this.objects[this.Iterator].y;
+            }
+            this.openflag=false;
+            this.pre_visible = false;
+            this.board.x = -SCREEN_WIDTH;
+            this.board.y = -SCREEN_HEIGHT;
+            return this.parentname;
+        }
+        break;
     }
+    return this.name;
   },
   resetorder: function(){
     var y = 110;
@@ -435,6 +972,9 @@ phina.define("GameObject",{
     
     this.hitpoint = 10;
     
+    this.roundpoint=0;
+    
+    this.match = false;
     
     this.x_tmp=0;
     this.y_tmp=0;
@@ -478,6 +1018,8 @@ phina.define("GameObject",{
     this.sitcounter=0;
     this.cattackcounter=0;
     this.attackable=true;
+    this.idolfromwinflag=false;
+    this.sflag=false;
   },
   update: function(pointer,pointers,keyboard,owner){
     
@@ -502,6 +1044,7 @@ phina.define("GameObject",{
       this.jslash_count=0;
     }
     if(this.status==="idol"&&this.towinpose){
+      this.towinpose=false;
       this.object_ss.gotoAndPlay("winpose");
       this.statusupdate();
     }
@@ -541,7 +1084,13 @@ phina.define("GameObject",{
       this.hitflag=false;
       this.sousai=false;
     }
-    
+    if(this.status=="idol"&&this.pre_status=="wintoidol"&&!this.sflag){
+      this.sflag=true;
+      this.idolfromwinflag=true;
+    }
+    else{
+      this.idolfromwinflag=false;
+    }
     //入力
     if(this.inputable){
       var p = pointer;
@@ -641,7 +1190,7 @@ phina.define("GameObject",{
           if(this.winposecounter>=30){
             this.winposecounter=0;
             this.object_ss.gotoAndPlay("wintoidol");
-            updatehantei(this);
+            this.statusupdate();
           }
         }
         if(this.status=="damage"){
@@ -1269,16 +1818,23 @@ phina.define("GameObject",{
       default:
         i=5;
     }
-    if(hanteilist[i][this.frame]==null){
-      console.log(this.status,this.frame,this.counter_hold);
+    var frame = this.frame;
+    if(str == "winpose"|| str=="wintoidol"){
+      frame = 0;
     }
-    (hanteilist[i][this.frame].hantei.length).times(function(j){
+    if(str=="jdamage_keep"){
+      frame = 20;
+    }
+    if(hanteilist[i][frame]==null){
+      console.log(i,this.status,frame);
+    }
+    (hanteilist[i][frame].hantei.length).times(function(j){
       var h = new Object();
-      h.type = hanteilist[i][this.frame].hantei[j].type;
-      h.x1 = hanteilist[i][this.frame].hantei[j].x1/FOUR;
-      h.y1 = hanteilist[i][this.frame].hantei[j].y1/FOUR;
-      h.x2 = hanteilist[i][this.frame].hantei[j].x2/FOUR;
-      h.y2 = hanteilist[i][this.frame].hantei[j].y2/FOUR;
+      h.type = hanteilist[i][frame].hantei[j].type;
+      h.x1 = hanteilist[i][frame].hantei[j].x1/FOUR;
+      h.y1 = hanteilist[i][frame].hantei[j].y1/FOUR;
+      h.x2 = hanteilist[i][frame].hantei[j].x2/FOUR;
+      h.y2 = hanteilist[i][frame].hantei[j].y2/FOUR;
       
       if(this.direction=="right"){
         var tmp = h.x1;
@@ -1393,6 +1949,13 @@ phina.define("MainScene", {
     this.superInit(options);
 
     
+    this.gn = 3;
+    this.deuce = true;
+    this.cpu_vs_cpu = false;
+    
+    this.se = 1;
+    this.bgm = 1;
+    
     // 背景
     this.bg = Sprite("bg25").addChildTo(this);
     this.bg1 = Sprite("bg25").addChildTo(this);
@@ -1451,11 +2014,21 @@ phina.define("MainScene", {
     
     this.clist_c={};
     this.clist_c["root"] = GameConsole("root",null,["settings","exit"],this.m_center,120);
+    this.clist_c["settings"] = GameConsole("settings","root",["settings_t","game_settings","sound_settings","back_s"],this.m_center);
+    this.clist_c["game_settings"] = GameConsole("game_settings","settings",["game_settings_t","game_num","deuce","cpu_vs_cpu","back_s"],this.m_center,0,this);
+    this.clist_c["sound_settings"] = GameConsole("sound_settings","settings",["sound_settings_t","se","bgm","back_s"],this.m_center,0,this);
+    this.clist_c["exit"] = GameConsole("exit","root",["exit_message","yes","no"],this.m_center,0,this);
+    this.clist_c["settings"].parent.hide();
+    this.clist_c["game_settings"].parent.hide();
+    this.clist_c["sound_settings"].parent.hide();
+    this.clist_c["exit"].parent.hide();
+    
+    
     var clists = [this.clist1,this.clist_c,this.clist2];
     var pointflag=true;
     //this.pcflag=false;
     var conpstart = function(e){
-      if(!clists[0]["entry"].parent.visible&&!clists[2]["entry"].parent.visible){
+      if(!clists[0]["entry"].parent.visible&&!clists[2]["entry"].parent.visible&&!clists[1]["settings"].parent.visible&&!clists[1]["exit"].parent.visible){
         var tl = e.interactive.app.touchList.touches;
         if(this.getParent().getParent().visible&&tl.length==1){
           pointflag=true;
@@ -1528,18 +2101,28 @@ phina.define("MainScene", {
       this.clist2[con].dummy.onpointend=conpend;
     }
     for(con in this.clist_c){
-      this.clist_c[con].dummy.setInteractive(true);
-      this.clist_c[con].dummy.onpointstart=conpstart;
-      this.clist_c[con].dummy.onpointmove = conpmove;
-      this.clist_c[con].dummy.onpointend = conpend;
+      if(con=="root"){
+        this.clist_c[con].dummy.setInteractive(true);
+        this.clist_c[con].dummy.onpointstart=conpstart;
+        this.clist_c[con].dummy.onpointmove = conpmove;
+        this.clist_c[con].dummy.onpointend = conpend;
+      }
     }
     this.menu2.alpha=0.25;
     this.m_center.alpha = 0.25;
     
-    this.decolate = DisplayElement().addChildTo(this);
     
-    this.ready = Sprite("ready").addChildTo(this.decolate);
-    this.fight = Sprite("fight").addChildTo(this.decolate);
+    /*this.board_test = DisplayElement().addChildTo(this);
+    this.backrect_test = RectangleShape({width:SCREEN_WIDTH*3/4,height:SCREEN_HEIGHT*3/4,fill:"#000",stroke:"false"}).addChildTo(this.board_test);
+    this.label_test = Label({text:"Settings",y:-SCREEN_HEIGHT/4,fill:"#fff",fontFamily:"fantasy",fontSize:18}).addChildTo(this.board_test);
+    this.label_test = Label({text:"Game Settings",y:0-10,fill:"#fff",fontFamily:"fantasy",fontSize:12}).addChildTo(this.board_test);
+    this.label_test = Label({text:"Sound Settings",y:SCREEN_HEIGHT/6-10,fill:"#fff",fontFamily:"fantasy",fontSize:12}).addChildTo(this.board_test);
+    this.label_test = Label({text:"Back",y:SCREEN_HEIGHT*2/6-10,fill:"#fff",fontFamily:"fantasy",fontSize:12}).addChildTo(this.board_test);
+    this.backrect_test.alpha=0.5;
+    this.board_test.tweener.clear().set({x:SCREEN_WIDTH/2,y:120,scaleX:0.1,scaleY:0.1}).to({x:SCREEN_WIDTH/2,y:SCREEN_HEIGHT/2,scaleX:1,scaleY:1},500,"easeOutQuart");
+    */
+    
+    this.decolate = DisplayElement().addChildTo(this);
     
     this.hitpoints = [RectangleShape({originX:0.5,originY:0,x:5+5,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
     ,RectangleShape({originX:0.5,originY:0,x:5+12,y:0,width:5,height:20,stroke:false,fill:"#f44"}).addChildTo(this.decolate)
@@ -1569,6 +2152,17 @@ phina.define("MainScene", {
       hp.hide();
     },this);
     
+    this.ready = Sprite("ready").addChildTo(this.decolate);
+    this.fight = Sprite("fight").addChildTo(this.decolate);
+    
+    this.you_r = Sprite("you_r").addChildTo(this.decolate);
+    this.you_b = Sprite("you_b").addChildTo(this.decolate);
+    this.win = Sprite("win").addChildTo(this.decolate);
+    this.lose = Sprite("lose").addChildTo(this.decolate);
+    this.you_r.hide();
+    this.you_b.hide();
+    this.win.hide();
+    this.lose.hide();
     this.decolate.hide();
     
     this.hanteilist = [];
@@ -1613,10 +2207,32 @@ phina.define("MainScene", {
     this.SEpool.forEach(function(se){
       se.volume=0.15;
     });
+    
+    this.BGMpool=[];
+    this.lobbyBGM = AssetManager.get("sound","lobby");
+    this.BGMpool.push(this.lobbyBGM);
+    this.battleBGM = AssetManager.get("sound","battle");
+    this.BGMpool.push(this.battleBGM);
+    this.winJingle = AssetManager.get("sound","win");
+    this.BGMpool.push(this.winJingle);
+    this.loseJingle = AssetManager.get("sound","lose");
+    this.BGMpool.push(this.loseJingle);
+    this.BGMpool.forEach(function(bgm){
+      bgm.volume=0.2;
+    });
+    this.lobbyBGM.loop=true;
+    this.lobbyBGM.play();
+    
     this.fflag=false;
     this.pre_fflag=false;
     this.dflag=false;
     this.pre_dfalg=false;
+    this.sflag=false;
+    this.pre_sflag=false;
+    
+    this.controlobj=null;
+    this.gameset = false;
+    this.winobj = null;
   },
   
   // 更新
@@ -1643,8 +2259,17 @@ phina.define("MainScene", {
     }
     
     var clists = [this.clist1,this.clist_c,this.clist2];
+    var settingsflag=false;
+    for(con in this.clist_c){
+      if(con.match("settings")&&this.clist_c[con].parent.visible){
+        settingsflag=true;
+      }
+      if(con == "exit"&&this.clist_c[con].parent.visible){
+        settingsflag=true;
+      }
+    }
     if(this.surface.visible){
-      if(!this.clist1["entry"].parent.visible&&!this.clist2["entry"].parent.visible){
+      if(!this.clist1["entry"].parent.visible&&!this.clist2["entry"].parent.visible&&!settingsflag){
         if(app.keyboard.getKeyDown("right")){
           clists.forEach(function(clist,i){
             if(clist["root"].owner.alpha==1){
@@ -1852,35 +2477,141 @@ phina.define("MainScene", {
     if(this.dflag&&!this.pre_dflag){
       this.decolate.tweener.clear().call(function(){
         gos.forEach(function(go,i){
-          go.attackable=false;
-        });
-        app.fps=5;
-      }).wait(1000).call(function(){
-        app.fps=30;
-      }).wait(1000).call(function(){
-        gos.forEach(function(go,i){
-          go.hitpoint=10;
-          if(go.status=="dead"){
-            go.object_ss.gotoAndPlay("wakeup");
-            go.statusupdate();
-            this.fflag=true;
+          if(go.hitpoint==0){
+            go.target.roundpoint++;
+            if(!this.deuce&&go.target.roundpoint==this.gn){
+              
+              this.winobj=go.target;
+              go.target.sfag=false;
+              this.controlobj.inputable=false;
+              this.controlobj.mode="safe";
+              this.gameset=true;
+            }
+            if(this.deuce&&go.match&&go.target.roundpoint+1 >= this.gn){
+              go.match = false;
+            }
+            if(this.deuce && go.target.match){
+              this.winobj = go.target;
+              go.target.sfag=false;
+              this.controlobj.inputable=false;
+              this.controlobj.mode="safe";
+              this.gameset = true;
+            }
+            if(this.deuce && go.target.roundpoint > go.roundpoint && go.target.roundpoint+1 >= this.gn){
+              go.target.match = true;
+            }
           }
-          this.dflag=false;
+          go.attackable=false;
         },this);
+        app.fps=5;
+      },this).wait(1000).call(function(){
+        app.fps=30;
+        
+      },this).wait(1000).call(function(){
+        console.log(gos[0].match,gos[0].roundpoint,gos[1].match,gos[1].roundpoint,this.gn);
+        if(this.gameset){
+          if(this.controlobj == this.winobj){
+            this.battleBGM.stop();
+            this.battleBGM.isplaying=false;
+            this.winJingle.play();
+            this.you_r.show();
+            this.you_r.tweener.clear().set({y:20,x:-100}).to({x:SCREEN_WIDTH+this.you_r.width/2},2000,"easeOutInQuart").call(function(){this.you_r.hide();this.decolate.hide();},this);
+            this.win.show();
+            this.win.tweener.clear().set({y:40,x:SCREEN_WIDTH+100}).to({x:-this.win.width/2},2000,"easeOutInQuart").call(function(){this.win.hide();},this);
+          }
+          else{
+            this.battleBGM.stop();
+            this.battleBGM.isplaying=false;
+            this.loseJingle.play();
+            this.you_b.show();
+            this.you_b.tweener.clear().set({y:20,x:-100}).to({x:SCREEN_WIDTH+this.you_b.width/2},2000,"easeOutInQuart").call(function(){this.you_b.hide();this.decolate.hide();},this);
+            this.lose.show();
+            this.lose.tweener.clear().set({y:40,x:SCREEN_WIDTH+100}).to({x:-this.lose.width/2},2000,"easeOutInQuart").call(function(){this.lose.hide();},this);
+          }
+        }
+        if(this.winobj!=null){
+          this.winobj.towinpose=true;
+          this.winobj.sflag=false;
+          this.winobj=null;
+        }
+        gos.forEach(function(go,i){
+            go.hitpoint=10;
+            if(!this.gameset&&go.status=="dead"){
+              go.object_ss.gotoAndPlay("wakeup");
+              go.statusupdate();
+            }
+            
+        },this);
+        if(!this.gameset)
+          this.fflag=true;
+        else{
+         this.gameset=false;
+        }
+        this.dflag=false;
       },this);
     }
+    gos.forEach(function(go,i){
+      if(go.idolfromwinflag){
+        this.sflag=true;
+      }
+    },this);
+    if(this.sflag&&!this.pre_sflag){
+      this.gameset=false;
+      gos.forEach(function(go,i){
+        go.match=false;
+        go.roundpoint=0;
+        if(go.status=="dead"){
+          go.object_ss.gotoAndPlay("wakeup");
+          go.statusupdate();
+        }
+      },this);  
+      this.sflag=false;
+      gos.forEach(function(go){
+        go.attackable=true;
+        go.target.attackable=true;
+        go.demo=true;
+        go.target.demo=true;  
+      });
+      this.battleBGM.stop();
+      this.battleBGM.isplaying=false;
+      this.lobbyBGM.loop=true;
+      this.lobbyBGM.play();
+      this.lobbyBGM.isplaying=true;
+      this.hitpoints.forEach(function(hp){
+        hp.hide();
+      });
+      this.hitpoints2.forEach(function(hp){
+        hp.hide();
+      });
+      //this.decolate.hide();
+      this.surface.show();
+      if(this.clist1["entry"].parent.visible){
+        this.clist1["entry"].parent.hide();
+        this.clist1["root"].parent.show();
+      }
+      if(this.clist2["entry"].parent.visible){
+        this.clist2["entry"].parent.hide();
+        this.clist2["root"].parent.show();
+      }
+    }
     var clists2 = [this.clist1,this.clist2];
-    var controlobj = null;
+    
     clists2.forEach(function(clist,i){
       if(clist["entry"].parent.visible){
         var obj=clist["entry"].controlobj;
         if(obj.mode=="standby"&&obj.status=="idol"&&obj.target.mode=="standby"&&obj.target.status=="idol"){
           this.fflag = true;
-          controlobj = obj;
+          this.controlobj = obj;
         }
       }
     },this);
     if(this.fflag&&!this.pre_fflag){
+      this.lobbyBGM.stop();
+      this.lobbyBGM.isplaying=false;
+      this.battleBGM.loop=true;
+      if(!this.battleBGM.isplaying)
+        this.battleBGM.play();
+      this.battleBGM.isplaying=true;
       this.surface.hide();
       this.decolate.show();
       
@@ -1895,11 +2626,11 @@ phina.define("MainScene", {
         this.decolate.tweener.clear().wait(100).call(function(){this.fightSE.play();},this);
         this.fight.tweener.clear().set({x: SCREEN_WIDTH/2,y: -18}).to({y: SCREEN_HEIGHT+18},1000,"easeOutInQuart").call(function(){
           this.fight.hide();
-          if(controlobj!=null){
-            controlobj.inputable=true;
-            controlobj.demo=false;
-            controlobj.target.mode="safe";
-            controlobj.target.demo=false;
+          if(this.controlobj!=null){
+            this.controlobj.inputable=true;
+            this.controlobj.demo=false;
+            this.controlobj.target.mode="safe";
+            this.controlobj.target.demo=false;
           }
           gos.forEach(function(go,i){
             go.attackable=true;
@@ -1912,7 +2643,173 @@ phina.define("MainScene", {
      //console.log(app.canvas.miterLimit);
  this.pre_fflag=this.fflag;
  this.pre_dflag=this.dflag;
+ this.pre_sflag=this.sflag;
   }
+});
+
+
+phina.define('myResultScene', {
+  superClass: 'phina.display.DisplayScene',
+  /**
+   * @constructor
+   */
+  init: function(params) {
+    params = ({}).$safe(params, phina.game.ResultScene.defaults);
+    this.superInit(params);
+
+    var message = params.message.format(params);
+
+    this.backgroundColor = params.backgroundColor;
+
+    this.fromJSON({
+      children: {
+        scoreText: {
+          className: 'phina.display.Label',
+          arguments: {
+            text: 'score',
+            fill: params.fontColor,
+            stroke: null,
+            fontSize: 4,
+          },
+          x: this.gridX.span(8),
+          y: this.gridY.span(4),
+        },
+        scoreLabel: {
+          className: 'phina.display.Label',
+          arguments: {
+            text: params.score+'',
+            fill: params.fontColor,
+            stroke: null,
+            fontSize: 7,
+          },
+          x: this.gridX.span(8),
+          y: this.gridY.span(6),
+        },
+
+        messageLabel: {
+          className: 'phina.display.Label',
+          arguments: {
+            text: message,
+            fill: params.fontColor,
+            stroke: null,
+            fontSize: 3,
+          },
+          x: this.gridX.center(),
+          y: this.gridY.span(9),
+        },
+
+        shareButton: {
+          className: 'phina.ui.Button',
+          arguments: [{
+            text: '★',
+            width: 128,
+            height: 128,
+            fontColor: params.fontColor,
+            fontSize: 5,
+            cornerRadius: 6,
+            fill: 'rgba(240, 240, 240, 0.5)',
+            // stroke: '#aaa',
+            // strokeWidth: 2,
+          }],
+          x: this.gridX.center(-3),
+          y: this.gridY.span(12),
+        },
+        playButton: {
+          className: 'phina.ui.Button',
+          arguments: [{
+            text: '?',
+            width: 128,
+            height: 128,
+            fontColor: params.fontColor,
+            fontSize: 5,
+            cornerRadius: 6,
+            fill: 'rgba(240, 240, 240, 0.5)',
+            // stroke: '#aaa',
+            // strokeWidth: 2,
+          }],
+          x: this.gridX.center(3),
+          y: this.gridY.span(12),
+
+          interactive: true,
+          onpush: function() {
+            this.exit();
+          }.bind(this),
+        },
+      }
+    });
+
+    if (params.exitType === 'touch') {
+      this.on('pointend', function() {
+        this.exit();
+      });
+    }
+
+    this.shareButton.onclick = function() {
+      var text = 'Score: {0}\n{1}'.format(params.score, message);
+      var url = phina.social.Twitter.createURL({
+        text: text,
+        hashtags: params.hashtags,
+        url: params.url,
+      });
+      window.open(url, 'share window', 'width=480, height=320');
+    };
+  },
+
+  _static: {
+    defaults: {
+      score: 16,
+
+      message: 'this is phina.js project.',
+      hashtags: 'phina_js,game,javascript',
+      url: phina.global.location && phina.global.location.href,
+
+      fontColor: 'white',
+      backgroundColor: 'hsl(200, 80%, 64%)',
+      backgroundImage: '',
+    },
+  },
+
+});
+phina.define('mySplashScene', {
+  superClass: 'phina.display.DisplayScene',
+
+  init: function(options) {
+    var defaults = phina.game.SplashScene.defaults;
+    this.superInit(options);
+
+    this.backgroundColor = "#efe";
+
+    var texture = phina.asset.Texture();
+    texture.load(defaults.imageURL).then(function() {
+      this._init();
+    }.bind(this));
+    this.texture = texture;
+  },
+
+  _init: function() {
+    this.sprite = phina.display.Sprite(this.texture).addChildTo(this);
+    this.sprite.scaleX = 0.2;
+    this.sprite.scaleY = 0.2;
+    this.sprite.setPosition(this.gridX.center(), this.gridY.center());
+    this.sprite.alpha = 0;
+
+    this.sprite.tweener
+      .clear()
+      .to({alpha:1}, 500, 'easeOutCubic')
+      .wait(1000)
+      .to({alpha:0}, 500, 'easeOutCubic')
+      .wait(250)
+      .call(function() {
+        this.exit();
+      }, this)
+      ;
+  },
+
+  _static: {
+    defaults: {
+      imageURL: 'http://cdn.rawgit.com/phi-jp/phina.js/develop/logo.png',
+    },
+  },
 });
 
 /*
@@ -1921,13 +2818,28 @@ phina.define("MainScene", {
 phina.main(function() {
   // アプリケーションを生成
   var app = GameApp({
+     scenes: [
+        {
+          className: 'mySplashScene',
+          label: 'splash',
+          nextLabel: "main"
+        },
+        {
+          label: "main", // ラベル。参照用
+          className: "MainScene", // シーンAのクラス名
+        },
+        {
+          label: "Result",
+          className: "myResultScene",
+          nextLabel: "splash"
+        }
+      ],
     startLabel: 'main',   // MainScene から開始
     width: SCREEN_WIDTH,  // 画面幅
     height: SCREEN_HEIGHT,// 画面高さ
     assets: ASSETS,       // アセット読み込み
   });
   //app.enableStats();
-  
   // 実行
   app.run();
 });</script>
