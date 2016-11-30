@@ -47,7 +47,7 @@ h1 {
 // グローバルに展開
 phina.globalize();
 // 定数
-//window.onerror = function (msg, file, line, column, err) {
+window.onerror = function (msg, file, line, column, err) {
     /*
     msg: error message
     file: file path
@@ -55,15 +55,18 @@ phina.globalize();
     column: column number
     err: error object
     */ 
-//    alert(msg + file + ':' + line);
-//};
+    alert(msg + file + ':' + line);
+};
 var ASSETS = {
   image: {
     bg25: "https://rawgit.com/rrf1050/test/master/graphic/haikei25.png",
     yukari_legacy: "https://rawgit.com/rrf1050/test/master/graphic/yukari25_c16_4bit.png",
     yukari_origin: "https://rawgit.com/rrf1050/test/master/graphic/yukari25_master_master_6bit_origin.png",
-    cursor_up: "https://rawgit.com/rrf1050/test/master/graphic/cursor/cursor_up.png",
-    cursor_down: "https://rawgit.com/rrf1050/test/master/graphic/cursor/cursor_down.png",
+    yukari_white:"https://rawgit.com/rrf1050/test/master/graphic/yukari25_6bit_white.png",
+    maki_origin:"https://rawgit.com/rrf1050/test/master/graphic/maki25_6bit_master.png",
+    maki_white:"https://rawgit.com/rrf1050/test/master/graphic/maki25_6bit_master_white.png",
+    maki_bskin:"https://rawgit.com/rrf1050/test/master/graphic/maki25_6bit_bskin.png",
+    
     back: "https://rawgit.com/rrf1050/test/master/graphic/surface/Back.png",
     charactor: "https://rawgit.com/rrf1050/test/master/graphic/surface/charactor.png",
     color: "https://rawgit.com/rrf1050/test/master/graphic/surface/Color.png",
@@ -76,6 +79,7 @@ var ASSETS = {
     origin: "https://rawgit.com/rrf1050/test/master/graphic/surface/Origin.png",
     legacy: "https://rawgit.com/rrf1050/test/master/graphic/surface/Legacy.png",
     white: "https://rawgit.com/rrf1050/test/master/graphic/surface/White.png",
+    bskin: "https://rawgit.com/rrf1050/test/master/graphic/surface/bskin.png",
     settings_t: "https://rawgit.com/rrf1050/test/master/graphic/settings/settings_t.png",
     game_settings: "https://rawgit.com/rrf1050/test/master/graphic/settings/game_settings.png",
     sound_settings: "https://rawgit.com/rrf1050/test/master/graphic/settings/sound_settings.png",
@@ -109,6 +113,7 @@ var ASSETS = {
 	spritesheet: {
 		"yukari_legacy_ss":"https://rawgit.com/rrf1050/test/master/ss/yukari25_c16.json",
 		"yukari_origin_ss":"https://rawgit.com/rrf1050/test/master/ss/yukari25_master.json",
+		"maki_origin_ss":"https://rawgit.com/rrf1050/test/master/ss/maki25_master.json",
 	},
 	json: {
 	  hantei0: 'https://rawgit.com/rrf1050/test/master/hantei/backstep/backstephantei.txt.json',
@@ -154,6 +159,12 @@ var ASSETS = {
 	  battle: "https://rawgit.com/rrf1050/test/master/bgm/n51.mp3",
 	  win: 'https://rawgit.com/rrf1050/test/master/bgm/win.mp3',
 	  lose: 'https://rawgit.com/rrf1050/test/master/bgm/lose.mp3',
+	  splash_zunko: "https://rawgit.com/rrf1050/test/master/se/splash.wav",
+	  splash_maki: "https://rawgit.com/rrf1050/test/master/se/splash_maki.wav",
+	  splash_yukari: "https://rawgit.com/rrf1050/test/master/se/splash_yukari.wav",
+	},
+	font:{
+	  mypixel: "https://rawgit.com/rrf1050/test/master/font/minikstt.woff",
 	}
 };
 
@@ -294,9 +305,9 @@ phina.define("GameConsole",{
         }
       }
       if(this.name == "sound_settings"){
-        this.segage = RectangleShape({originX:0,x:-25,y:-10,fill:"#fff",stroke:false,width:100,height:10}).addChildTo(this.board);
+        this.segage = RectangleShape({originX:0,x:-25,y:-10,fill:"#fff",stroke:false,width:100*this.controlobj.se,height:10}).addChildTo(this.board);
         this.segage_dummy = DisplayElement({originX:0,width:100,height:10}).addChildTo(this.segage);
-        this.bgmgage = RectangleShape({originX:0,x:-25,y:SCREEN_HEIGHT*1/(elements.length*2)-10,fill:"#fff",stroke:false,width:100,height:10}).addChildTo(this.board);
+        this.bgmgage = RectangleShape({originX:0,x:-25,y:SCREEN_HEIGHT*1/(elements.length*2)-10,fill:"#fff",stroke:false,width:100*this.controlobj.bgm,height:10}).addChildTo(this.board);
         this.bgmgage_dummy = DisplayElement({originX:0,width:100,height:10}).addChildTo(this.bgmgage);
       }
       if(!phina.isMobile()){
@@ -454,9 +465,11 @@ phina.define("GameConsole",{
             this.keyqueue.shift();
           }
           if(key=="up"){
+            owner.cursorSE.play();
             this.up(y_offset);
           }
           else if(key=="down"){
+            owner.cursorSE.play();
             this.down(y_offset);
           }
           else if(key=="z"){
@@ -467,6 +480,7 @@ phina.define("GameConsole",{
             }
           }
           else if(key=="x"){
+            owner.cancelSE.play();
             this.resetorder();
             this.keyqueue=[];
             return this.parentname;
@@ -496,6 +510,7 @@ phina.define("GameConsole",{
       this.controlobj.mode="standby";
       this.controlobj.target.mode="standby";
       if(keyboard.getKeyDown("x")){
+        owner.cancelSE.play();
         this.controlobj.mode="safe";
         this.controlobj.target.mode="safe";
         return this.parentname;
@@ -539,6 +554,7 @@ phina.define("GameConsole",{
         }
         if(!phina.isMobile()){
           if(keyboard.getKeyDown("up")){
+            owner.cursorSE.play();
             this.Iterator = (this.Iterator-1<0) ?  this.objects.length-1:this.Iterator-1;
             if(this.name == "settings")
               this.cursor.x = -this.objects[this.Iterator].width/2-10;
@@ -549,6 +565,7 @@ phina.define("GameConsole",{
             this.cursor.y = this.objects[this.Iterator].y;
           }
           else if(keyboard.getKeyDown("down")){
+            owner.cursorSE.play();
             this.Iterator = (this.Iterator+1>this.objects.length-1) ?  0 :this.Iterator+1;
             if(this.name == "settings")
               this.cursor.x = -this.objects[this.Iterator].width/2-10;
@@ -595,6 +612,7 @@ phina.define("GameConsole",{
             return ret;
           }
           else if(keyboard.getKeyDown("x")){
+            owner.cancelSE.play();
             this.Iterator=0;
             if(this.name == "settings")
               this.cursor.x = -this.objects[this.Iterator].width/2-10;
@@ -637,11 +655,13 @@ phina.define("GameConsole",{
       if(this.openflag){
         if(!phina.isMobile()){
           if(keyboard.getKeyDown("left")){
+            owner.cursorSE.play();
             this.Iterator = this.Iterator-1<0 ? this.objects.length-1 : this.Iterator-1;
             this.cursor.x = this.objects[this.Iterator].x -20;
             this.cursor.y = this.objects[this.Iterator].y;
           }
           else if(keyboard.getKeyDown("right")){
+            owner.cursorSE.play();
             this.Iterator = this.Iterator+1>this.objects.length-1 ? 0 : this.Iterator+1;
             this.cursor.x = this.objects[this.Iterator].x -20;
             this.cursor.y = this.objects[this.Iterator].y;
@@ -651,6 +671,7 @@ phina.define("GameConsole",{
             return ret;
           }
           else if(keyboard.getKeyDown("x")){
+            owner.cancelSE.play();
             this.Iterator=1;
             this.cursor.x = this.objects[this.Iterator].x -20;
             this.cursor.y = this.objects[this.Iterator].y;
@@ -727,76 +748,115 @@ phina.define("GameConsole",{
       case "root": 
         switch(this.objects[0].name){
           case "color":
+            owner.cursorSE.play();
             if(this.controlobj.object.name.match("yukari"))
               return "color_y";
             else if(this.controlobj.object.name.match("maki"))
               return "color_m";
-              break;
+            break;
+          case "entry":
+            owner.enterSE.play();
+            return "entry";
           default:
+            owner.cursorSE.play();
             return this.objects[0].name;
         }
         break;
       case "color_y":
         switch(this.objects[0].name){
           case "back":
+            owner.cancelSE.play();
             this.resetorder();
             return this.parentname;
           default:
-            this.controlobj.statusupdate();
-            var tmpx=this.controlobj.object.x,tmpy=this.controlobj.object.y;
             var chara="yukari";
             var objname=chara+"_"+this.objects[0].name;
-            var objssname=objname+"_ss";
-            this.controlobj.object_ss.remove();
-            this.controlobj.object.remove();
-            this.controlobj.object=Sprite(objname).addChildTo(owner.fighters);
-            this.controlobj.object.setPosition(tmpx,tmpy);
-            this.controlobj.object.origin.set(0,0);
-            this.controlobj.object.frameIndex=0;
-            this.controlobj.object_ss = FrameAnimation(objssname);
-            this.controlobj.object_ss.attachTo(this.controlobj.object);
-            this.controlobj.object_ss.gotoAndPlay(this.controlobj.status);
-            this.controlobj.object_ss.currentFrameIndex=this.controlobj.frame;
+            if(this.controlobj.target.object.name!=objname&&this.controlobj.object.name!=objname){
+              owner.cursorSE.play();
+              this.controlobj.statusupdate();
+              var tmpx=this.controlobj.object.x,tmpy=this.controlobj.object.y;
+              var objssname=objname+"_ss";
+              if(objname!="yukari_legacy"){
+                objssname = "yukari_origin_ss";
+              }
+              this.controlobj.object_ss.remove();
+              this.controlobj.object.remove();
+              this.controlobj.object=Sprite(objname).addChildTo(owner.fighters);
+              this.controlobj.object.setPosition(tmpx,tmpy);
+              this.controlobj.object.origin.set(0,0);
+              this.controlobj.object.frameIndex=0;
+              this.controlobj.object_ss = FrameAnimation(objssname);
+              this.controlobj.object_ss.attachTo(this.controlobj.object);
+              this.controlobj.object_ss.gotoAndPlay(this.controlobj.status);
+              this.controlobj.object_ss.currentFrameIndex=this.controlobj.frame;
+            }
             break;
         }
         break;
       case "color_m":
         switch(this.objects[0].name){
           case "back":
+            owner.cancelSE.play();
             this.resetorder();
             return this.parentname;
           default:
-            this.controlobj.statusupdate();
-            var tmpx=this.controlobj.object.x,tmpy=this.controlobj.object.y;
             var chara="maki";
             var objname=chara+"_"+this.objects[0].name;
-            var objssname=objname+"_ss";
-            this.controlobj.object_ss.remove();
-            this.controlobj.object.remove();
-            this.controlobj.object=Sprite(objname).addChildTo(owner.fighters);
-            this.controlobj.object.setPosition(tmpx,tmpy);
-            this.controlobj.object.origin.set(0,0);
-            this.controlobj.object.frameIndex=0;
-            this.controlobj.controlobj.object_ss = FrameAnimation(objssname);
-            this.controlobj.object_ss.attachTo(this.controlobj.object);
-            this.controlobj.object_ss.gotoAndPlay(this.controlobj.status);
-            this.controlobj.object_ss.currentFrameIndex=this.controlobj.frame;
+            if(this.controlobj.target.object.name!=objname&&this.controlobj.object.name!=objname){
+              owner.cursorSE.play();
+              this.controlobj.statusupdate();
+              var tmpx=this.controlobj.object.x,tmpy=this.controlobj.object.y;
+              var chara="maki";
+              var objname=chara+"_"+this.objects[0].name;
+              var objssname="maki_origin_ss";
+              this.controlobj.object_ss.remove();
+              this.controlobj.object.remove();
+              this.controlobj.object=Sprite(objname).addChildTo(owner.fighters);
+              this.controlobj.object.setPosition(tmpx,tmpy);
+              this.controlobj.object.origin.set(0,0);
+              this.controlobj.object.frameIndex=0;
+              this.controlobj.object_ss = FrameAnimation(objssname);
+              this.controlobj.object_ss.attachTo(this.controlobj.object);
+              this.controlobj.object_ss.gotoAndPlay(this.controlobj.status);
+              this.controlobj.object_ss.currentFrameIndex=this.controlobj.frame;
+            }
             break;
         }
         break;
       case "charactor":
         switch(this.objects[0].name){
           case "back":
+            owner.cancelSE.play();
             this.resetorder();
             return this.parentname;
           default:
-            //TODO
+            var chara = this.objects[0].name.split("_")[1];
+            if(!this.controlobj.object.name.match(chara)){
+              owner.cursorSE.play();
+              this.controlobj.statusupdate();
+              var tmpx=this.controlobj.object.x,tmpy=this.controlobj.object.y;
+              var objname = chara + "_origin";
+              if(this.controlobj.target.object.name==objname)
+                objname = chara + "_white";
+              var objssname = chara+"_origin_ss";
+              this.controlobj.object_ss.remove();
+              this.controlobj.object.remove();
+              this.controlobj.object=Sprite(objname).addChildTo(owner.fighters);
+              this.controlobj.object.setPosition(tmpx,tmpy);
+              this.controlobj.object.origin.set(0,0);
+              this.controlobj.object.frameIndex=0;
+              this.controlobj.object_ss = FrameAnimation(objssname);
+              this.controlobj.object_ss.attachTo(this.controlobj.object);
+              this.controlobj.object_ss.gotoAndPlay(this.controlobj.status);
+              this.controlobj.object_ss.currentFrameIndex=this.controlobj.frame;
+            }
             break;
         }
         break;
       case "settings":
         switch(this.objects[this.Iterator].name){
           case "back_s":
+            owner.cancelSE.play();
             this.openflag=false;
             this.pre_visible = false;
             this.board.x = -SCREEN_WIDTH;
@@ -808,12 +868,14 @@ phina.define("GameConsole",{
             }
             return this.parentname;
           default:
+            owner.cursorSE.play();
             return this.objects[this.Iterator].name;
         }
         break;
       case "game_settings":
         switch(this.objects[this.Iterator].name){
           case "back_s":
+            owner.cancelSE.play();
             this.Iterator=0;
             if(!phina.isMobile()){
               this.cursor.x = this.objects[this.Iterator].x -10;
@@ -821,6 +883,7 @@ phina.define("GameConsole",{
             }
             return this.parentname;
           case "game_num":
+            owner.cursorSE.play();
             owner.gn = (owner.gn + 1) > 5 ? 1 : owner.gn + 1;
             this.gns.forEach(function(gn){
               gn.hide();
@@ -828,6 +891,7 @@ phina.define("GameConsole",{
             this.gns[owner.gn-1].show();
             return this.name;
           case "deuce":
+            owner.cursorSE.play();
             if(owner.gn != 1){
               if(owner.deuce)
                 owner.deuce=false;
@@ -844,6 +908,7 @@ phina.define("GameConsole",{
             }
             return this.name;
           case "cpu_vs_cpu":
+            owner.cursorSE.play();
             if(owner.cpu_vs_cpu)
               owner.cpu_vs_cpu=false;
             else
@@ -862,6 +927,7 @@ phina.define("GameConsole",{
       case "sound_settings":
         switch(this.objects[this.Iterator].name){
           case "back_s":
+            owner.cancelSE.play();
             this.Iterator=0;
             if(!phina.isMobile()){
               this.cursor.x = this.objects[this.Iterator].x -10;
@@ -869,42 +935,40 @@ phina.define("GameConsole",{
             }
             return this.parentname;
           case "bgm":
+            var satiflag=false;
+            if(owner.bgm==1)
+              satiflag=true;
             owner.bgm = (owner.bgm + 0.1) > 1 ? 1 : owner.bgm + 0.1;
             owner.BGMpool.forEach(function(bgm){
               bgm.volume = 0.2*owner.bgm;
             });
             this.bgmgage.width = owner.bgm*100;
+            if(!satiflag)
+              owner.cursorSE.play();
             return this.name;
           case "se":
+            var satiflag=false;
+            if(owner.se==1)
+              satiflag=true;
             owner.se = (owner.se + 0.1) > 1 ? 1 : owner.se + 0.1;
             owner.SEpool.forEach(function(se){
               se.volume = 0.15*owner.se;
             });
+            if(!satiflag)
+              owner.cursorSE.play();
             this.segage.width = owner.se*100;
-            return this.name;
-          case "cpu_vs_cpu":
-            if(owner.cpu_vs_cpu)
-              owner.cpu_vs_cpu=false;
-            else
-              owner.cpu_vs_cpu=true;
-            if(owner.cpu_vs_cpu){
-              this.on_cvc.show();
-              this.off_cvc.hide();
-            }
-            else{
-              this.on_cvc.hide();
-              this.off_cvc.show();
-            }
             return this.name;
         }
         break;
       case "exit":
         switch(this.objects[this.Iterator].name){
           case "yes":
+            owner.cursorSE.play();
             owner.lobbyBGM.stop();
             owner.exit();
             return this.name;
           case "no":
+            owner.cancelSE.play();
             this.Iterator=1;
             if(!phina.isMobile()){
               this.cursor.x = this.objects[this.Iterator].x -20;
@@ -1953,8 +2017,8 @@ phina.define("MainScene", {
     this.deuce = true;
     this.cpu_vs_cpu = false;
     
-    this.se = 1;
-    this.bgm = 1;
+    this.se = 0.75;
+    this.bgm = 0.75;
     
     // 背景
     this.bg = Sprite("bg25").addChildTo(this);
@@ -1970,7 +2034,7 @@ phina.define("MainScene", {
     this.fighters = DisplayElement().addChildTo(this);
     // プレイヤー
     this.player = GameObject(['yukari_origin'],'yukari_origin_ss',this.fighters,-300/FOUR,0,false);
-    this.enemy = GameObject(['yukari_legacy'],'yukari_legacy_ss',this.fighters,300/FOUR,0,true);
+    this.enemy = GameObject(['maki_origin'],'maki_origin_ss',this.fighters,300/FOUR,0,true);
     
     this.player.object.reverse=true;
     this.player.inputable=false;
@@ -1992,8 +2056,8 @@ phina.define("MainScene", {
     this.clist1={};
     this.clist1["root"] = GameConsole("root",null,["charactor","color","entry"],this.menu1,50,this.player);
     this.clist1["charactor"] = GameConsole("charactor","root",["c_maki","c_yukari","back"],this.menu1,50,this.player);
-    this.clist1["color_y"] = GameConsole("color_y","root",["origin","legacy","back"],this.menu1,50,this.player);
-    this.clist1["color_m"] = GameConsole("color_m","root",["origin","white","back"],this.menu1,50,this.player);
+    this.clist1["color_y"] = GameConsole("color_y","root",["origin","white","legacy","back"],this.menu1,50,this.player);
+    this.clist1["color_m"] = GameConsole("color_m","root",["origin","white","bskin","back"],this.menu1,50,this.player);
     this.clist1["entry"] = GameConsole("entry","root",[],this.menu1,50,this.player);
     this.clist1["charactor"].parent.hide();
     this.clist1["color_y"].parent.hide();
@@ -2004,8 +2068,8 @@ phina.define("MainScene", {
     this.clist2={};
     this.clist2["root"] = GameConsole("root",null,["charactor","color","entry"],this.menu2,190,this.enemy);
     this.clist2["charactor"] = GameConsole("charactor","root",["c_maki","c_yukari","back"],this.menu2,190,this.enemy);
-    this.clist2["color_y"] = GameConsole("color_y","root",["origin","legacy","back"],this.menu2,190,this.enemy);
-    this.clist2["color_m"] = GameConsole("color_m","root",["origin","white","back"],this.menu2,190,this.enemy);
+    this.clist2["color_y"] = GameConsole("color_y","root",["origin","white","legacy","back"],this.menu2,190,this.enemy);
+    this.clist2["color_m"] = GameConsole("color_m","root",["origin","white","bskin","back"],this.menu2,190,this.enemy);
     this.clist2["entry"] = GameConsole("entry","root",[],this.menu2,190,this.enemy);
     this.clist2["charactor"].parent.hide();
     this.clist2["color_y"].parent.hide();
@@ -2205,8 +2269,8 @@ phina.define("MainScene", {
     this.SEpool.push(this.todomeSE);
     
     this.SEpool.forEach(function(se){
-      se.volume=0.15;
-    });
+      se.volume=0.15*this.se;
+    },this);
     
     this.BGMpool=[];
     this.lobbyBGM = AssetManager.get("sound","lobby");
@@ -2218,10 +2282,12 @@ phina.define("MainScene", {
     this.loseJingle = AssetManager.get("sound","lose");
     this.BGMpool.push(this.loseJingle);
     this.BGMpool.forEach(function(bgm){
-      bgm.volume=0.2;
-    });
+      bgm.volume=0.2*this.bgm;
+    },this);
     this.lobbyBGM.loop=true;
     this.lobbyBGM.play();
+    
+    this.roundlabel = Label({fill:"#222",text:this.player.roundpoint+" - "+this.enemy.roundpoint,x:SCREEN_WIDTH/2,y:SCREEN_HEIGHT/8,fontFamily:"mypixel",fontSize:20}).addChildTo(this.decolate);
     
     this.fflag=false;
     this.pre_fflag=false;
@@ -2273,6 +2339,7 @@ phina.define("MainScene", {
         if(app.keyboard.getKeyDown("right")){
           clists.forEach(function(clist,i){
             if(clist["root"].owner.alpha==1){
+              this.cursorSE.play();
               clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQuart");
               clists[(i+1)%clists.length]["root"].owner.tweener.clear().to({alpha: 1},200,"easeOutQuart");
             }
@@ -2281,6 +2348,7 @@ phina.define("MainScene", {
         else if(app.keyboard.getKeyDown("left")){
           clists.forEach(function(clist,i){
             if(clist["root"].owner.alpha==1){
+              this.cursorSE.play();
               clist["root"].owner.tweener.clear().to({alpha: 0.25},200,"easeOutQuart");
               clists[(i-1)*(i-1<0?-(clists.length-1):1)]["root"].owner.tweener.clear().to({alpha: 1},200,"easeOutQuart");
             }
@@ -2508,6 +2576,7 @@ phina.define("MainScene", {
         app.fps=30;
         
       },this).wait(1000).call(function(){
+        this.roundlabel.text = gos[0].roundpoint+ " - " + gos[1].roundpoint;
         console.log(gos[0].match,gos[0].roundpoint,gos[1].match,gos[1].roundpoint,this.gn);
         if(this.gameset){
           if(this.controlobj == this.winobj){
@@ -2627,7 +2696,10 @@ phina.define("MainScene", {
         this.fight.tweener.clear().set({x: SCREEN_WIDTH/2,y: -18}).to({y: SCREEN_HEIGHT+18},1000,"easeOutInQuart").call(function(){
           this.fight.hide();
           if(this.controlobj!=null){
-            this.controlobj.inputable=true;
+            if(!this.cpu_vs_cpu)
+              this.controlobj.inputable=true;
+            else
+              this.controlobj.mode="safe";
             this.controlobj.demo=false;
             this.controlobj.target.mode="safe";
             this.controlobj.target.demo=false;
@@ -2702,8 +2774,8 @@ phina.define('myResultScene', {
           className: 'phina.ui.Button',
           arguments: [{
             text: '★',
-            width: 128,
-            height: 128,
+            width: 28,
+            height: 28,
             fontColor: params.fontColor,
             fontSize: 5,
             cornerRadius: 6,
@@ -2717,9 +2789,9 @@ phina.define('myResultScene', {
         playButton: {
           className: 'phina.ui.Button',
           arguments: [{
-            text: '?',
-            width: 128,
-            height: 128,
+            text: '▶',
+            width: 28,
+            height: 28,
             fontColor: params.fontColor,
             fontSize: 5,
             cornerRadius: 6,
@@ -2792,11 +2864,32 @@ phina.define('mySplashScene', {
     this.sprite.scaleY = 0.2;
     this.sprite.setPosition(this.gridX.center(), this.gridY.center());
     this.sprite.alpha = 0;
-
+    var zunko = AssetManager.get("sound","splash_zunko");
+    var maki = AssetManager.get("sound","splash_maki");
+    var yukari = AssetManager.get("sound","splash_yukari");
+    var splashes = [zunko,maki,yukari];
+    var Iterator = Math.random();
+    if(Iterator < 1/3){
+      Iterator = 0;
+      this.backgroundColor = "#cfc";
+    }
+    else if(Iterator < 2/3){
+      Iterator = 1;
+      this.backgroundColor = "#ffc";
+    }
+    else {
+      Iterator = 2;
+      this.backgroundColor = "#ecf";
+    }
+    this.splashSE = splashes[Iterator];
+    
     this.sprite.tweener
       .clear()
       .to({alpha:1}, 500, 'easeOutCubic')
-      .wait(1000)
+      .call(function(){
+        this.splashSE.play();
+      },this)
+      .wait(4000)
       .to({alpha:0}, 500, 'easeOutCubic')
       .wait(250)
       .call(function() {
@@ -2834,7 +2927,7 @@ phina.main(function() {
           nextLabel: "splash"
         }
       ],
-    startLabel: 'main',   // MainScene から開始
+    startLabel: 'splash',   // MainScene から開始
     width: SCREEN_WIDTH,  // 画面幅
     height: SCREEN_HEIGHT,// 画面高さ
     assets: ASSETS,       // アセット読み込み
