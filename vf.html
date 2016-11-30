@@ -109,6 +109,8 @@ var ASSETS = {
     you_b: "https://rawgit.com/rrf1050/test/master/graphic/decolate/you_b.png",
     win: "https://rawgit.com/rrf1050/test/master/graphic/decolate/win.png",
     lose: "https://rawgit.com/rrf1050/test/master/graphic/decolate/lose.png",
+    
+    logo: "https://rawgit.com/rrf1050/test/master/graphic/logo/logo.png",
   },
 	spritesheet: {
 		"yukari_legacy_ss":"https://rawgit.com/rrf1050/test/master/ss/yukari25_c16.json",
@@ -2789,7 +2791,7 @@ phina.define('myResultScene', {
         playButton: {
           className: 'phina.ui.Button',
           arguments: [{
-            text: '?',
+            text: '▶',
             width: 28,
             height: 28,
             fontColor: params.fontColor,
@@ -2851,17 +2853,18 @@ phina.define('mySplashScene', {
 
     this.backgroundColor = "#efe";
 
-    var texture = phina.asset.Texture();
+    this._init();
+    /*var texture = phina.asset.Texture();
     texture.load(defaults.imageURL).then(function() {
       this._init();
     }.bind(this));
-    this.texture = texture;
+    this.texture = texture;*/
   },
 
   _init: function() {
-    this.sprite = phina.display.Sprite(this.texture).addChildTo(this);
-    this.sprite.scaleX = 0.2;
-    this.sprite.scaleY = 0.2;
+    this.sprite = phina.display.Sprite("logo").addChildTo(this);
+    this.sprite.scaleX = 0.28;
+    this.sprite.scaleY = 0.28;
     this.sprite.setPosition(this.gridX.center(), this.gridY.center());
     this.sprite.alpha = 0;
     var zunko = AssetManager.get("sound","splash_zunko");
