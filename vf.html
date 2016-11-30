@@ -2789,7 +2789,7 @@ phina.define('myResultScene', {
         playButton: {
           className: 'phina.ui.Button',
           arguments: [{
-            text: '▶',
+            text: '?',
             width: 28,
             height: 28,
             fontColor: params.fontColor,
@@ -2914,7 +2914,7 @@ phina.main(function() {
      scenes: [
         {
           className: 'mySplashScene',
-          label: 'splash',
+          label: '_splash',
           nextLabel: "main"
         },
         {
@@ -2927,7 +2927,7 @@ phina.main(function() {
           nextLabel: "splash"
         }
       ],
-    startLabel: 'splash',   // MainScene から開始
+    startLabel: '_splash',   // MainScene から開始
     width: SCREEN_WIDTH,  // 画面幅
     height: SCREEN_HEIGHT,// 画面高さ
     assets: ASSETS,       // アセット読み込み
