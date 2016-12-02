@@ -15,6 +15,7 @@ http://rrfgames.sitemix.jp/vf.html
   box-sizing: border-box; 
     overflow-y: hidden;
      overflow-x: hidden;
+     
 }
 canvas{
   image-rendering: -moz-crisp-edges;         /* Firefox */
@@ -23,9 +24,11 @@ canvas{
   image-rendering: crisp-edges;
   -ms-interpolation-mode: nearest-neighbor;  /* IE (非標準プロパティ) */
   image-rendering: pixelated;
+  
+  -webkit-font-smoothing: none;
 }
 html {
-  font-size: 62.5%;
+  /*font-size: 62.5%;*/
 
 }
 body {
@@ -34,7 +37,7 @@ body {
   background-color: hsl(0, 0%, 96%);
 }
 h1 {
-  font-size: 1.8rem;
+  /*font-size: 1.8rem;*/
 }
 
   </style>
@@ -47,7 +50,7 @@ h1 {
 // グローバルに展開
 phina.globalize();
 // 定数
-window.onerror = function (msg, file, line, column, err) {
+//window.onerror = function (msg, file, line, column, err) {
     /*
     msg: error message
     file: file path
@@ -55,8 +58,8 @@ window.onerror = function (msg, file, line, column, err) {
     column: column number
     err: error object
     */ 
-    alert(msg + file + ':' + line);
-};
+//    alert(msg + file + ':' + line);
+//};
 var ASSETS = {
   image: {
     bg25: "https://rawgit.com/rrf1050/test/master/graphic/haikei25.png",
@@ -67,6 +70,31 @@ var ASSETS = {
     maki_white:"https://rawgit.com/rrf1050/test/master/graphic/maki25_6bit_master_white.png",
     maki_bskin:"https://rawgit.com/rrf1050/test/master/graphic/maki25_6bit_bskin.png",
     
+    maki_thumnail:"https://rawgit.com/rrf1050/test/master/graphic/credit/maki_thumnail[1].png",
+    yukari_thumnail:"https://rawgit.com/rrf1050/test/master/graphic/credit/yukari_thumnail[1].png",
+    
+    credit_150:"https://rawgit.com/rrf1050/test/master/graphic/credit/150shibari.png",
+    credit_alknsama:"https://rawgit.com/rrf1050/test/master/graphic/credit/alknsama.png",
+    credit_contributor:"https://rawgit.com/rrf1050/test/master/graphic/credit/contributor.png",
+    credit_gamelibrary:"https://rawgit.com/rrf1050/test/master/graphic/credit/gamelibrary.png",
+    credit_kinosama:"https://rawgit.com/rrf1050/test/master/graphic/credit/kinosama.png",
+    credit_kinoshiki:"https://rawgit.com/rrf1050/test/master/graphic/credit/kinoshiki.png",
+    credit_maou:"https://rawgit.com/rrf1050/test/master/graphic/credit/maou.png",
+    credit_model:"https://rawgit.com/rrf1050/test/master/graphic/credit/model.png",
+    credit_next:"https://rawgit.com/rrf1050/test/master/graphic/credit/next.png",
+    credit_phisama:"https://rawgit.com/rrf1050/test/master/graphic/credit/phisama.png",
+    credit_previous:"https://rawgit.com/rrf1050/test/master/graphic/credit/previous.png",
+    credit_programming:"https://rawgit.com/rrf1050/test/master/graphic/credit/programming.png",
+    credit_rrf:"https://rawgit.com/rrf1050/test/master/graphic/credit/rrf.png",
+    credit_simiraaaasama:"https://rawgit.com/rrf1050/test/master/graphic/credit/simiraaaasama.png",
+    credit_sound:"https://rawgit.com/rrf1050/test/master/graphic/credit/sound.png",
+    credit_specialthanks:"https://rawgit.com/rrf1050/test/master/graphic/credit/specialthanks.png",
+    credit_thematch:"https://rawgit.com/rrf1050/test/master/graphic/credit/thematch.png",
+    credit_tureduresama:"https://rawgit.com/rrf1050/test/master/graphic/credit/tureduresama.png",
+    credit_yuurisama:"https://rawgit.com/rrf1050/test/master/graphic/credit/yuurisama.png",
+    credit_yuurishiki:"https://rawgit.com/rrf1050/test/master/graphic/credit/yuurishiki.png",
+    credit_ken:"https://rawgit.com/rrf1050/test/master/graphic/credit/ken.png",
+    
     back: "https://rawgit.com/rrf1050/test/master/graphic/surface/Back.png",
     charactor: "https://rawgit.com/rrf1050/test/master/graphic/surface/charactor.png",
     color: "https://rawgit.com/rrf1050/test/master/graphic/surface/Color.png",
@@ -76,6 +104,8 @@ var ASSETS = {
     settings: "https://rawgit.com/rrf1050/test/master/graphic/surface/Settings.png",
     title: "https://rawgit.com/rrf1050/test/master/graphic/surface/title.png",
     exit: "https://rawgit.com/rrf1050/test/master/graphic/surface/Exit.png",
+    tutorial: "https://rawgit.com/rrf1050/test/master/graphic/surface/tutorial.png",
+    credit: "https://rawgit.com/rrf1050/test/master/graphic/surface/credit.png",
     origin: "https://rawgit.com/rrf1050/test/master/graphic/surface/Origin.png",
     legacy: "https://rawgit.com/rrf1050/test/master/graphic/surface/Legacy.png",
     white: "https://rawgit.com/rrf1050/test/master/graphic/surface/White.png",
@@ -111,6 +141,7 @@ var ASSETS = {
     lose: "https://rawgit.com/rrf1050/test/master/graphic/decolate/lose.png",
     
     logo: "https://rawgit.com/rrf1050/test/master/graphic/logo/logo.png",
+    logo_c: "https://rawgit.com/rrf1050/test/master/graphic/credit/phinajs.png",
   },
 	spritesheet: {
 		"yukari_legacy_ss":"https://rawgit.com/rrf1050/test/master/ss/yukari25_c16.json",
@@ -189,18 +220,265 @@ phina.define("GameInput",{
 phina.define("GameConsole",{
   
   init: function(name,parentname,elements,owner,x,controlobj){
-    if(!name.match("settings")&&name!="exit"){
+    this.controlobj = controlobj;
+    this.keyqueue=[];
+    this.name = name;
+    this.parentname = parentname;
+    this.elements = elements;
+    this.objects = [];
+    this.owner = owner;
+    this.parent = DisplayElement().addChildTo(owner);
+    if (name == "tutorial"){
+      this.openflag=false;
+      this.pre_visible=false;
+      this.board = DisplayElement().addChildTo(this.parent);
+      this.board.Iterator = 0;
+      this.Iterator = 0;
+      this.board.x = -SCREEN_WIDTH;
+      this.board.y = -SCREEN_HEIGHT;
+      this.board.enterflag=false;
+      this.backrect = RectangleShape({
+        width:SCREEN_WIDTH*3/4,
+        height:SCREEN_HEIGHT*3/4,
+        fill:"#000",
+        stroke:"false"
+      }).addChildTo(this.board);
+      this.backrect.alpha=0.5;
+      this.objects.push(DisplayElement().addChildTo(this.board));
+      
+      this.previouse = Sprite("credit_previous").addChildTo(this.board);
+      this.previouse.originX=0;
+      this.previouse.x=-SCREEN_WIDTH*2/5+5;
+      this.previouse.y=SCREEN_HEIGHT/3;
+      this.back = Sprite("back_s").addChildTo(this.board);
+      this.back.y=SCREEN_HEIGHT/3;
+      this.next = Sprite("credit_next").addChildTo(this.board);
+      this.next.originX=1;
+      this.next.x=SCREEN_WIDTH*2/5-5;
+      this.next.y=SCREEN_HEIGHT/3;
+      this.objects[0].hide();
+      Label({
+        text:"Tutorial",
+        originX:0,
+        x: -SCREEN_WIDTH*2/5+10,
+        y: -SCREEN_HEIGHT/4,
+        fontSize: 18,
+        fontFamily: "impact",
+        fill: "#fff",
+      }).addChildTo(this.objects[0]);
+      Label({
+        text:"1:左右にスワイプ\n　して歩行\n　指を離すと\n　止まります\n　(PCは方向キー)",
+        originX:0,
+        x:-SCREEN_WIDTH*4/5+20,
+        y:3,
+        fontSize:8,
+        fontWeight:700,
+        fill: "#fff",
+        align: "left",
+      }).addChildTo(this.objects[0]);
+      this.papet = Sprite("yukari_origin").addChildTo(this.objects[0]);
+      this.papet.reverse=true;
+      this.papet.scale.set(0.5,0.5);
+      this.papet.origin.set(0,0);
+      this.papet_ss = FrameAnimation("yukari_origin_ss").attachTo(this.papet);
+      this.papet_ss.gotoAndPlay("walk");
+      var ss = this.papet_ss;
+      this.papet.y = -45;
+      this.papet.x=-10;
+      this.previouse.setInteractive(true);
+      this.finger = RectangleShape({
+        x:40,
+        y:50,
+        width:20,
+        height:40,
+      }).addChildTo(this.objects[0]);
+      var finger = this.finger;
+      this.papet.tweener.clear().call(function(){
+        ss.gotoAndPlay("walk");
+        finger.tweener.clear().set({x:40,y:50}).to({x:80},100);
+      }).wait(2000).call(function(){
+        ss.gotoAndPlay("idol");
+        finger.tweener.clear().set({x:85,y:45}).wait(500).to({x:40},100).wait(500).set({x:40,y:50});
+      }).wait(2000).setLoop(true);
+      var self =this;
+      this.previouse.onpointend=function(){
+        if(this.getParent().visible){
+          if(0<this.getParent().Iterator)
+          this.getParent().Iterator--;
+        }
+      }
+      this.back.setInteractive(true);
+      this.back.onpointend = function(){
+        if(this.getParent().visible&&self.openflag){
+          this.getParent().enterflag=true;
+        }
+      }
+      this.next.setInteractive(true);
+      var length = this.objects.length;
+      this.next.onpointend=function(){
+        if(this.getParent().visible){
+          if(this.getParent().Iterator<length-1)
+          this.getParent().Iterator++;
+        }
+      }
+      //this.title = Sprite(elements[0]).addChildTo(this.board);
+      //this.title.y= -SCREEN_HEIGHT/4;
+      
+    }
+    else if(name=="credit"){
+      this.openflag=false;
+      this.pre_visible=false;
+      this.board = DisplayElement().addChildTo(this.parent);
+      this.board.Iterator = 0;
+      this.board.x = -SCREEN_WIDTH;
+      this.board.y = -SCREEN_HEIGHT;
+      this.board.enterflag=false;
+      this.backrect = RectangleShape({
+        width:SCREEN_WIDTH*3/4,
+        height:SCREEN_HEIGHT*3/4,
+        fill:"#000",
+        stroke:"false"
+      }).addChildTo(this.board);
+      this.backrect.alpha=0.5;
+      this.objects.push(DisplayElement().addChildTo(this.board));
+      this.objects.push(DisplayElement().addChildTo(this.board));
+      this.objects.push(DisplayElement().addChildTo(this.board));
+      this.objects.push(DisplayElement().addChildTo(this.board));
+      this.objects.push(DisplayElement().addChildTo(this.board));
+      this.objects.push(DisplayElement().addChildTo(this.board));
+      this.objects.push(DisplayElement().addChildTo(this.board));
+      this.title1 = Sprite("credit_model").addChildTo(this.objects[0]);
+      this.title1.originX=0;
+      this.title1.x=-SCREEN_WIDTH*2/5+10;
+      this.title1.y=-SCREEN_HEIGHT/4;
+      this.element1_1 = Sprite("credit_kinoshiki").addChildTo(this.objects[0]);
+      this.element1_1.x=-SCREEN_WIDTH/6;
+      this.element1_1.y=5-10;
+      this.element1_2 = Sprite("credit_kinosama").addChildTo(this.objects[0]);
+      this.element1_2.x=-SCREEN_WIDTH/6;
+      this.element1_2.y=5+10;
+      this.element1_3 = Sprite("maki_thumnail").addChildTo(this.objects[0]);
+      this.element1_3.x=SCREEN_WIDTH/5;
+      
+      this.title1 = Sprite("credit_model").addChildTo(this.objects[1]);
+      this.title1.originX=0;
+      this.title1.x=-SCREEN_WIDTH*2/5+10;
+      this.title1.y=-SCREEN_HEIGHT/4;
+      this.element1_1 = Sprite("credit_yuurishiki").addChildTo(this.objects[1]);
+      this.element1_1.x=-SCREEN_WIDTH/6;
+      this.element1_1.y=5-10;
+      this.element1_2 = Sprite("credit_yuurisama").addChildTo(this.objects[1]);
+      this.element1_2.x=-SCREEN_WIDTH/6;
+      this.element1_2.y=5+10;
+      this.element1_3 = Sprite("yukari_thumnail").addChildTo(this.objects[1]);
+      this.element1_3.x=SCREEN_WIDTH/5;
+      
+      this.title1 = Sprite("credit_model").addChildTo(this.objects[2]);
+      this.title1.originX=0;
+      this.title1.x=-SCREEN_WIDTH*2/5+10;
+      this.title1.y=-SCREEN_HEIGHT/4;
+      this.element1_1 = Sprite("credit_150").addChildTo(this.objects[2]);
+      this.element1_1.x=-SCREEN_WIDTH/6;
+      this.element1_1.y=5-10;
+      this.element1_2 = Sprite("credit_tureduresama").addChildTo(this.objects[2]);
+      this.element1_2.x=-SCREEN_WIDTH/6;
+      this.element1_2.y=5+10;
+      this.element1_3 = Sprite("credit_ken").addChildTo(this.objects[2]);
+      this.element1_3.scale.set(0.2,0.2);
+      this.element1_3.x=SCREEN_WIDTH/5;
+      
+      
+      this.title1 = Sprite("credit_sound").addChildTo(this.objects[3]);
+      this.title1.originX=0;
+      this.title1.x=-SCREEN_WIDTH*2/5+10;
+      this.title1.y=-SCREEN_HEIGHT/4;
+      this.element1_1 = Sprite("se").addChildTo(this.objects[3]);
+      this.element1_1.x=-SCREEN_WIDTH/4;
+      this.element1_1.y=5-10;
+      this.element1_2 = Sprite("bgm").addChildTo(this.objects[3]);
+      this.element1_2.x=-SCREEN_WIDTH/4;
+      this.element1_2.y=5+10;
+      this.element1_3 = Sprite("credit_thematch").addChildTo(this.objects[3]);
+      this.element1_3.x=15;
+      this.element1_3.y=5-10;
+      this.element1_4 = Sprite('credit_maou').addChildTo(this.objects[3]);
+      this.element1_4.x=15;
+      this.element1_4.y=5+10;
+      
+      this.title1 = Sprite("credit_gamelibrary").addChildTo(this.objects[4]);
+      this.title1.originX=0;
+      this.title1.x=-SCREEN_WIDTH*2/5+10;
+      this.title1.y=-SCREEN_HEIGHT/4+1;
+      var sprite = Sprite("logo_c").addChildTo(this.objects[4]);
+      sprite.scale.set(0.25,0.25);
+      sprite.y=5;
+      var sprite2 = Sprite("credit_phisama").addChildTo(this.objects[4]);
+      sprite2.y=28;
+      sprite2.x=70;
+      
+      this.title1 = Sprite("credit_specialthanks").addChildTo(this.objects[5]);
+      this.title1.originX=0;
+      this.title1.x=-SCREEN_WIDTH*2/5+10;
+      this.title1.y=-SCREEN_HEIGHT/4+1;
+      var sprite3 = Sprite("credit_alknsama").addChildTo(this.objects[5]);
+      sprite3.x = -SCREEN_WIDTH/5;
+      sprite3.y=  -5;
+      var sprite4 = Sprite("credit_simiraaaasama").addChildTo(this.objects[5]);
+      sprite4.x = SCREEN_WIDTH/5;
+      sprite4.y= -5;
+      var sprite5 = Sprite("credit_contributor").addChildTo(this.objects[5]);
+      sprite5.y=13;
+      
+      this.title1 = Sprite("credit_programming").addChildTo(this.objects[6]);
+      this.title1.originX=0;
+      this.title1.x=-SCREEN_WIDTH*2/5+10;
+      this.title1.y=-SCREEN_HEIGHT/4+1;
+      var sprite6 = Sprite("credit_rrf").addChildTo(this.objects[6]);
+      
+      this.previouse = Sprite("credit_previous").addChildTo(this.board);
+      this.previouse.originX=0;
+      this.previouse.x=-SCREEN_WIDTH*2/5+5;
+      this.previouse.y=SCREEN_HEIGHT/3;
+      this.back = Sprite("back_s").addChildTo(this.board);
+      this.back.y=SCREEN_HEIGHT/3;
+      this.next = Sprite("credit_next").addChildTo(this.board);
+      this.next.originX=1;
+      this.next.x=SCREEN_WIDTH*2/5-5;
+      this.next.y=SCREEN_HEIGHT/3;
+      this.objects[0].hide();
+      this.objects[1].hide();
+      this.objects[2].hide();
+      this.objects[3].hide();
+      this.objects[4].hide();
+      this.objects[5].hide();
+      this.previouse.setInteractive(true);
+      var self =this;
+      this.previouse.onpointend=function(){
+        if(this.getParent().visible){
+          if(0<this.getParent().Iterator)
+          this.getParent().Iterator--;
+        }
+      }
+      this.back.setInteractive(true);
+      this.back.onpointend = function(){
+        if(this.getParent().visible&&self.openflag){
+          this.getParent().enterflag=true;
+        }
+      }
+      this.next.setInteractive(true);
+      var length = this.objects.length;
+      this.next.onpointend=function(){
+        if(this.getParent().visible){
+          if(this.getParent().Iterator<length-1)
+          this.getParent().Iterator++;
+        }
+      }
+    }
+    else if(!name.match("settings")&&name!="exit"){
       var y = 110;
       var y_offset = 12;
       
-      this.controlobj = controlobj;
-      this.keyqueue=[];
-      this.name = name;
-      this.parentname = parentname;
-      this.elements = elements;
-      this.objects = [];
-      this.owner = owner;
-      this.parent = DisplayElement().addChildTo(owner);
+      
       this.parent.clip = function(canvas){
         canvas.beginPath();
         canvas.rect(x-25,102,52,25);
@@ -217,7 +495,7 @@ phina.define("GameConsole",{
       this.dummy.upflag=false;
       this.dummy.downflag=false;
       
-      if(this.name != "entry"){
+      if(this.name != "entry"&&elements.length!==0){
         Math.floor(5/elements.length+1).times(function(){
           elements.forEach(function(element){
             var sprite = Sprite(element).addChildTo(this.list);
@@ -235,13 +513,6 @@ phina.define("GameConsole",{
       }
     }
     else if(name.match("settings")){
-      this.controlobj=controlobj;
-      this.name = name;
-      this.parentname = parentname;
-      this.elements = elements;
-      this.objects = [];
-      this.owner = owner;
-      this.parent = DisplayElement().addChildTo(owner);
       this.board = DisplayElement().addChildTo(this.parent);
       this.board.enterflag=false;
       this.board.Iterator=0;
@@ -392,14 +663,7 @@ phina.define("GameConsole",{
       }
     }
     else {//name == exit
-      this.controlobj=controlobj;
-      this.name = name;
-      this.parentname = parentname;
-      this.elements = elements;
-      this.objects = [];
       this.dummies = [];
-      this.owner = owner;
-      this.parent = DisplayElement().addChildTo(owner);
       this.board = DisplayElement().addChildTo(this.parent);
       this.board.enterflag=false;
       this.board.Iterator=0;
@@ -444,81 +708,155 @@ phina.define("GameConsole",{
     
     var y = 110;
     var y_offset = 12;
-    if(!this.name.match("settings")&&this.name!="exit"){
-    if(this.name!="entry"){
-      if(!phina.isMobile()){
-        
-        if(keyboard.getKeyDown("up")){
-          this.keyqueue.push("up");
-        }
-        else if(keyboard.getKeyDown("down")){
-          this.keyqueue.push("down");
-        }
-        if(keyboard.getKeyDown("z")){
-          this.keyqueue.push("z");
-        }
-        if(keyboard.getKeyDown("x")&&this.name!="root"){
-          this.keyqueue.push("x");
-        }
-        var key;
-        if(this.list.y===0){
-          if(this.keyqueue.length>0){
-            key = this.keyqueue[0];
-            this.keyqueue.shift();
+    if(this.name == "tutorial"||this.name == "credit"){
+      if(!this.pre_visible){
+        this.board.tweener.clear().set({
+          x:SCREEN_WIDTH/2,y:120,scaleX:0.1,scaleY:0.1
+        }).to({
+          x:SCREEN_WIDTH/2,y:SCREEN_HEIGHT/2,scaleX:1,scaleY:1
+        },500,"easeOutQuart").call(function(){
+          this.openflag=true;
+        },this);
+      }
+      if(this.openflag){
+        if(!phina.isMobile()){
+          var flag;
+          if((flag = keyboard.getKeyDown("z"))==true||keyboard.getKeyDown("right")){
+            
+            if(this.board.Iterator<this.objects.length-1){
+              owner.cursorSE.play();
+              this.board.Iterator++;
+            }
+            else if(flag){
+              owner.cursorSE.play();
+              this.board.Iterator=0;
+              this.openflag=false;
+              this.pre_visible = false;
+              this.board.x = -SCREEN_WIDTH;
+              this.board.y = -SCREEN_HEIGHT;
+            return this.parentname;
+            }
           }
-          if(key=="up"){
-            owner.cursorSE.play();
-            this.up(y_offset);
+          else if(keyboard.getKeyDown("x")){
+            owner.cancelSE.play();
+            this.board.Iterator=0;
+            this.openflag=false;
+            this.pre_visible = false;
+            this.board.x = -SCREEN_WIDTH;
+            this.board.y = -SCREEN_HEIGHT;
+            return this.parentname;
           }
-          else if(key=="down"){
-            owner.cursorSE.play();
-            this.down(y_offset);
+          else if(keyboard.getKeyDown("left")){
+            if(this.board.Iterator>0){
+              owner.cursorSE.play();
+              this.board.Iterator--;
+            }
           }
-          else if(key=="z"){
-            this.keyqueue=[];
+        }
+        else if(this.board.enterflag){
+          this.board.Iterator=0;
+          this.board.enterflag=false;
+          owner.cancelSE.play();
+          this.openflag=false;
+          this.pre_visible = false;
+          this.board.x = -SCREEN_WIDTH;
+          this.board.y = -SCREEN_HEIGHT;
+          return this.parentname;
+        }
+      }
+      this.objects.forEach(function(obj){
+        obj.hide();
+      });
+      this.objects[this.board.Iterator].show();
+      if(this.board.Iterator==0){
+        this.previouse.hide();
+      }
+      else{
+        this.previouse.show();
+      }
+      if(this.board.Iterator==this.objects.length-1){
+        this.next.hide();
+      }
+      else{
+        this.next.show();
+      }
+      this.pre_visible=this.parent.visible;
+    }
+    else if(!this.name.match("settings")&&this.name!="exit"){
+      if(this.name!="entry"){
+        if(!phina.isMobile()){
+          
+          if(keyboard.getKeyDown("up")){
+            this.keyqueue.push("up");
+          }
+          else if(keyboard.getKeyDown("down")){
+            this.keyqueue.push("down");
+          }
+          if(keyboard.getKeyDown("z")){
+            this.keyqueue.push("z");
+          }
+          if(keyboard.getKeyDown("x")&&this.name!="root"){
+            this.keyqueue.push("x");
+          }
+          var key;
+          if(this.list.y===0){
+            if(this.keyqueue.length>0){
+              key = this.keyqueue[0];
+              this.keyqueue.shift();
+            }
+            if(key=="up"){
+              owner.cursorSE.play();
+              this.up(y_offset);
+            }
+            else if(key=="down"){
+              owner.cursorSE.play();
+              this.down(y_offset);
+            }
+            else if(key=="z"){
+              this.keyqueue=[];
+              var ret = this.enter(owner);
+              if(ret != null){
+                return ret;
+              }
+            }
+            else if(key=="x"){
+              owner.cancelSE.play();
+              this.resetorder();
+              this.keyqueue=[];
+              return this.parentname;
+            }
+          }
+        }
+        else{
+          if(this.dummy.enterflag){
+            this.dummy.enterflag=false;
             var ret = this.enter(owner);
             if(ret != null){
               return ret;
             }
           }
-          else if(key=="x"){
-            owner.cancelSE.play();
-            this.resetorder();
-            this.keyqueue=[];
-            return this.parentname;
+          else if(this.dummy.upflag){
+            this.dummy.upflag=false;
+            this.up(y_offset);
+          }
+          else if(this.dummy.downflag){
+            this.dummy.downflag=false;
+            this.down(y_offset);
           }
         }
+        return this.name;
       }
       else{
-        if(this.dummy.enterflag){
-          this.dummy.enterflag=false;
-          var ret = this.enter(owner);
-          if(ret != null){
-            return ret;
-          }
+        this.controlobj.mode="standby";
+        this.controlobj.target.mode="standby";
+        if(keyboard.getKeyDown("x")){
+          owner.cancelSE.play();
+          this.controlobj.mode="safe";
+          this.controlobj.target.mode="safe";
+          return this.parentname;
         }
-        else if(this.dummy.upflag){
-          this.dummy.upflag=false;
-          this.up(y_offset);
-        }
-        else if(this.dummy.downflag){
-          this.dummy.downflag=false;
-          this.down(y_offset);
-        }
+        return this.name;
       }
-      return this.name;
-    }
-    else{
-      this.controlobj.mode="standby";
-      this.controlobj.target.mode="standby";
-      if(keyboard.getKeyDown("x")){
-        owner.cancelSE.play();
-        this.controlobj.mode="safe";
-        this.controlobj.target.mode="safe";
-        return this.parentname;
-      }
-      return this.name;
-    }
     }
     else if(this.name.match("settings")){
       if(!this.pre_visible){
@@ -644,7 +982,7 @@ phina.define("GameConsole",{
       this.pre_visible = this.parent.visible;
       return this.name;
     }
-    else{//this.name==exit
+    else if(this.name ==="exit"){//this.name==exit
       if(!this.pre_visible){
         this.board.tweener.clear().set({
           x:SCREEN_WIDTH/2,y:120,scaleX:0.1,scaleY:0.1
@@ -696,6 +1034,7 @@ phina.define("GameConsole",{
       this.pre_visible = this.parent.visible;
       return this.name;
     }
+    return this.name;
   },
   up: function(val){
     var y = 110;
@@ -1086,6 +1425,8 @@ phina.define("GameObject",{
     this.attackable=true;
     this.idolfromwinflag=false;
     this.sflag=false;
+    
+    this.fallcounter=0;
   },
   update: function(pointer,pointers,keyboard,owner){
     
@@ -1771,6 +2112,13 @@ phina.define("GameObject",{
       var jump_dy = jump_y-(2.5*Math.pow(this.frame-1-9.5,2)-106);
       this.object.y += jump_dy/FOUR;
       if(this.object.y>=0){
+        this.fallcounter=0;
+        this.object.y=0;
+        this.object_ss.gotoAndPlay("shirimochi");
+        this.statusupdate();
+      }
+      else if(this.fallcounter >= 22){
+        this.fallcounter=0;
         this.object.y=0;
         this.object_ss.gotoAndPlay("shirimochi");
         this.statusupdate();
@@ -1791,7 +2139,9 @@ phina.define("GameObject",{
       this.object.reverse=false;
     }
     
-    
+    if(this.status == "jdamage_keep"){
+      this.fallcounter++;
+    }
     
     if(this.df1_l)
       this.counter_df1_l++;
@@ -2051,8 +2401,8 @@ phina.define("MainScene", {
     this.title.y=10;
     
     this.menu1 = DisplayElement().addChildTo(this.surface);
-    this.m_center = DisplayElement().addChildTo(this.surface);
     this.menu2 = DisplayElement().addChildTo(this.surface);
+    this.m_center = DisplayElement().addChildTo(this.surface);
     
     
     this.clist1={};
@@ -2079,11 +2429,15 @@ phina.define("MainScene", {
     this.clist2["entry"].parent.hide();
     
     this.clist_c={};
-    this.clist_c["root"] = GameConsole("root",null,["settings","exit"],this.m_center,120);
+    this.clist_c["root"] = GameConsole("root",null,["settings","credit","tutorial","exit"],this.m_center,120);
     this.clist_c["settings"] = GameConsole("settings","root",["settings_t","game_settings","sound_settings","back_s"],this.m_center);
     this.clist_c["game_settings"] = GameConsole("game_settings","settings",["game_settings_t","game_num","deuce","cpu_vs_cpu","back_s"],this.m_center,0,this);
     this.clist_c["sound_settings"] = GameConsole("sound_settings","settings",["sound_settings_t","se","bgm","back_s"],this.m_center,0,this);
     this.clist_c["exit"] = GameConsole("exit","root",["exit_message","yes","no"],this.m_center,0,this);
+    this.clist_c["credit"] = GameConsole("credit","root",[],this.m_center,0);
+    this.clist_c["tutorial"] = GameConsole("tutorial","root",[],this.m_center,0);
+    this.clist_c["credit"].parent.hide();
+    this.clist_c["tutorial"].parent.hide();
     this.clist_c["settings"].parent.hide();
     this.clist_c["game_settings"].parent.hide();
     this.clist_c["sound_settings"].parent.hide();
@@ -2094,7 +2448,8 @@ phina.define("MainScene", {
     var pointflag=true;
     //this.pcflag=false;
     var conpstart = function(e){
-      if(!clists[0]["entry"].parent.visible&&!clists[2]["entry"].parent.visible&&!clists[1]["settings"].parent.visible&&!clists[1]["exit"].parent.visible){
+      if(!clists[0]["entry"].parent.visible&&!clists[2]["entry"].parent.visible&&!clists[1]["settings"].parent.visible
+      &&!clists[1]["exit"].parent.visible&&!clists[1]["credit"].parent.visible&&!clists[1]["tutorial"].parent.visible){
         var tl = e.interactive.app.touchList.touches;
         if(this.getParent().getParent().visible&&tl.length==1){
           pointflag=true;
@@ -2332,7 +2687,7 @@ phina.define("MainScene", {
       if(con.match("settings")&&this.clist_c[con].parent.visible){
         settingsflag=true;
       }
-      if(con == "exit"&&this.clist_c[con].parent.visible){
+      if((con == "credit"||con == "tutorial"||con == "exit")&&this.clist_c[con].parent.visible){
         settingsflag=true;
       }
     }
@@ -2671,6 +3026,7 @@ phina.define("MainScene", {
       if(clist["entry"].parent.visible){
         var obj=clist["entry"].controlobj;
         if(obj.mode=="standby"&&obj.status=="idol"&&obj.target.mode=="standby"&&obj.target.status=="idol"){
+          this.roundlabel.text = gos[0].roundpoint+ " - " + gos[1].roundpoint;
           this.fflag = true;
           this.controlobj = obj;
         }
@@ -2917,7 +3273,7 @@ phina.main(function() {
      scenes: [
         {
           className: 'mySplashScene',
-          label: '_splash',
+          label: 'splash',
           nextLabel: "main"
         },
         {
@@ -2930,12 +3286,12 @@ phina.main(function() {
           nextLabel: "splash"
         }
       ],
-    startLabel: '_splash',   // MainScene から開始
+    startLabel: 'main',   // MainScene から開始
     width: SCREEN_WIDTH,  // 画面幅
     height: SCREEN_HEIGHT,// 画面高さ
     assets: ASSETS,       // アセット読み込み
   });
-  //app.enableStats();
+  app.enableStats();
   // 実行
   app.run();
 });</script>
