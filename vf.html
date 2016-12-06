@@ -95,6 +95,14 @@ var ASSETS = {
     credit_yuurishiki:"https://rawgit.com/rrf1050/test/master/graphic/credit/yuurishiki.png",
     credit_ken:"https://rawgit.com/rrf1050/test/master/graphic/credit/ken.png",
     
+    tutorial_finger:"https://rawgit.com/rrf1050/test/master/graphic/tutorial/finger.png",
+    tutorial_finger_s:"https://rawgit.com/rrf1050/test/master/graphic/tutorial/finger_s.png",
+    tutorial_title:"https://rawgit.com/rrf1050/test/master/graphic/tutorial/tutorial_title.png",
+    tutorial_tex1:"https://rawgit.com/rrf1050/test/master/graphic/tutorial/tutorial_tex1.png",
+    tutorial_tex2:"https://rawgit.com/rrf1050/test/master/graphic/tutorial/tutorial_tex2.png",
+    tutorial_tex3:"https://rawgit.com/rrf1050/test/master/graphic/tutorial/tutorial_tex3.png",
+    tutorial_tex4:"https://rawgit.com/rrf1050/test/master/graphic/tutorial/tutorial_tex4.png",
+    
     back: "https://rawgit.com/rrf1050/test/master/graphic/surface/Back.png",
     charactor: "https://rawgit.com/rrf1050/test/master/graphic/surface/charactor.png",
     color: "https://rawgit.com/rrf1050/test/master/graphic/surface/Color.png",
@@ -142,6 +150,9 @@ var ASSETS = {
     
     logo: "https://rawgit.com/rrf1050/test/master/graphic/logo/logo.png",
     logo_c: "https://rawgit.com/rrf1050/test/master/graphic/credit/phinajs.png",
+    
+    result_yukari:"https://rawgit.com/rrf1050/test/master/graphic/result/result_yukari.png",
+    result_maki:"https://rawgit.com/rrf1050/test/master/graphic/result/result_maki.png",
   },
 	spritesheet: {
 		"yukari_legacy_ss":"https://rawgit.com/rrf1050/test/master/ss/yukari25_c16.json",
@@ -245,80 +256,230 @@ phina.define("GameConsole",{
       }).addChildTo(this.board);
       this.backrect.alpha=0.5;
       this.objects.push(DisplayElement().addChildTo(this.board));
+      this.objects.push(DisplayElement().addChildTo(this.board));
+      this.objects.push(DisplayElement().addChildTo(this.board));
+      this.objects.push(DisplayElement().addChildTo(this.board));
       
-      this.previouse = Sprite("credit_previous").addChildTo(this.board);
-      this.previouse.originX=0;
-      this.previouse.x=-SCREEN_WIDTH*2/5+5;
-      this.previouse.y=SCREEN_HEIGHT/3;
-      this.back = Sprite("back_s").addChildTo(this.board);
-      this.back.y=SCREEN_HEIGHT/3;
-      this.next = Sprite("credit_next").addChildTo(this.board);
-      this.next.originX=1;
-      this.next.x=SCREEN_WIDTH*2/5-5;
-      this.next.y=SCREEN_HEIGHT/3;
-      this.objects[0].hide();
-      Label({
-        text:"Tutorial",
-        originX:0,
-        x: -SCREEN_WIDTH*2/5+10,
-        y: -SCREEN_HEIGHT/4,
-        fontSize: 18,
-        fontFamily: "impact",
-        fill: "#fff",
-      }).addChildTo(this.objects[0]);
-      Label({
-        text:"1:左右にスワイプ\n　して歩行\n　指を離すと\n　止まります\n　(PCは方向キー)",
-        originX:0,
-        x:-SCREEN_WIDTH*4/5+20,
-        y:3,
-        fontSize:8,
-        fontWeight:700,
-        fill: "#fff",
-        align: "left",
-      }).addChildTo(this.objects[0]);
+      this.previouse_t = Sprite("credit_previous").addChildTo(this.board);
+      this.previouse_t.originX=0;
+      this.previouse_t.x=-SCREEN_WIDTH*2/5+5;
+      this.previouse_t.y=SCREEN_HEIGHT/3;
+      this.back_t = Sprite("back_s").addChildTo(this.board);
+      this.back_t.y=SCREEN_HEIGHT/3;
+      this.next_t = Sprite("credit_next").addChildTo(this.board);
+      this.next_t.originX=1;
+      this.next_t.x=SCREEN_WIDTH*2/5-5;
+      this.next_t.y=SCREEN_HEIGHT/3;
+      
+      var sprite = Sprite("tutorial_title").addChildTo(this.objects[0]);
+      sprite.originX=0;
+      sprite.x = -SCREEN_WIDTH*2/5+10;
+      sprite.y=-SCREEN_HEIGHT/4;
+      sprite = Sprite("tutorial_title").addChildTo(this.objects[1]);
+      sprite.originX=0;
+      sprite.x = -SCREEN_WIDTH*2/5+10;
+      sprite.y=-SCREEN_HEIGHT/4;
+      sprite= Sprite("tutorial_title").addChildTo(this.objects[2]);
+      sprite.originX=0;
+      sprite.x = -SCREEN_WIDTH*2/5+10;
+      sprite.y=-SCREEN_HEIGHT/4;
+      sprite=Sprite("tutorial_title").addChildTo(this.objects[3]);
+      sprite.originX=0;
+      sprite.x = -SCREEN_WIDTH*2/5+10;
+      sprite.y=-SCREEN_HEIGHT/4;
+      sprite=Sprite("tutorial_tex1").addChildTo(this.objects[0]);
+      sprite.originX=0;
+      sprite.x = -SCREEN_WIDTH*2/5+20;
+      sprite.y=3;
+      sprite = Sprite("tutorial_tex2").addChildTo(this.objects[1]);
+      sprite.originX=0;
+      sprite.x = -SCREEN_WIDTH*2/5+20;
+      sprite.y = 3;
+      sprite = Sprite("tutorial_tex3").addChildTo(this.objects[2]);
+      sprite.originX=0;
+      sprite.x = -SCREEN_WIDTH*2/5+20;
+      sprite.y = 3;
+      sprite = Sprite("tutorial_tex4").addChildTo(this.objects[3]);
+      sprite.originX=0;
+      sprite.x = -SCREEN_WIDTH*2/5+20;
+      sprite.y = 3;
+      
       this.papet = Sprite("yukari_origin").addChildTo(this.objects[0]);
       this.papet.reverse=true;
       this.papet.scale.set(0.5,0.5);
       this.papet.origin.set(0,0);
       this.papet_ss = FrameAnimation("yukari_origin_ss").attachTo(this.papet);
-      this.papet_ss.gotoAndPlay("walk");
+      this.papet_ss.gotoAndPlay("idol");
       var ss = this.papet_ss;
       this.papet.y = -45;
       this.papet.x=-10;
-      this.previouse.setInteractive(true);
-      this.finger = RectangleShape({
-        x:40,
-        y:50,
-        width:20,
-        height:40,
-      }).addChildTo(this.objects[0]);
+      this.finger_s = Sprite("tutorial_finger_s").addChildTo(this.objects[0]);
+      this.finger_s.alpha=0.8;
+      this.finger_s.x=42;
+      this.finger_s.y=32;
+      this.finger = Sprite("tutorial_finger").addChildTo(this.objects[0]);
+      this.finger.x=40;
+      this.finger.y=30;
       var finger = this.finger;
-      this.papet.tweener.clear().call(function(){
+      var finger_s = this.finger_s;
+      this.papet.tweener.clear().wait(1000).call(function(){
         ss.gotoAndPlay("walk");
-        finger.tweener.clear().set({x:40,y:50}).to({x:80},100);
+        finger.tweener.clear().set({x:40,y:30}).to({x:80},100);
+        finger_s.tweener.clear().set({x:42,y:32}).to({x:82},100);
       }).wait(2000).call(function(){
         ss.gotoAndPlay("idol");
-        finger.tweener.clear().set({x:85,y:45}).wait(500).to({x:40},100).wait(500).set({x:40,y:50});
+        finger.tweener.clear().set({x:85,y:25}).wait(500).to({x:45},100).wait(500).set({x:40,y:30});
+        finger_s.tweener.clear().set({x:87,y:37}).wait(500).to({x:47},100).wait(500).set({x:42,y:32});
+      }).wait(1000).setLoop(true);
+      
+     
+      this.papet = Sprite("yukari_origin").addChildTo(this.objects[1]);
+      this.papet.reverse=true;
+      this.papet.scale.set(0.5,0.5);
+      this.papet.origin.set(0,0);
+      this.papet_ss = FrameAnimation("yukari_origin_ss").attachTo(this.papet);
+      this.papet_ss.gotoAndPlay("idol");
+      var ss2 = this.papet_ss;
+      this.papet.y = -45;
+      this.papet.x=-10;
+      
+      this.finger_s = Sprite("tutorial_finger_s").addChildTo(this.objects[1]);
+      this.finger_s.alpha=0.8;
+      this.finger_s.x = 82;
+      this.finger_s.y= -8;
+      
+      this.finger = Sprite("tutorial_finger").addChildTo(this.objects[1]);
+      this.finger.x = 80;
+      this.finger.y= -10;
+      var finger2 = this.finger;
+      var finger_s2 = this.finger_s;
+      this.papet.tweener.clear().call(function(){
+        ss2.gotoAndPlay("sitdown");
+        finger2.tweener.clear().set({x:80,y:-10}).to({y:30},100);
+        finger_s2.tweener.clear().set({x:82,y:-8}).to({y:32},100);
+      }).wait(2000).call(function(){
+        ss2.gotoAndPlay("standup");
+        finger2.tweener.clear().set({x:85,y:25}).wait(500).to({y:-15},100).wait(500).set({x:80,y:-10});
+        finger_s2.tweener.clear().set({x:87,y:35}).wait(500).to({y:-5},100).wait(500).set({x:82,y:-8});
       }).wait(2000).setLoop(true);
+      
+     
+      this.papet = Sprite("yukari_origin").addChildTo(this.objects[2]);
+      this.papet.reverse=true;
+      this.papet.scale.set(0.5,0.5);
+      this.papet.origin.set(0,0);
+      this.papet_ss = FrameAnimation("yukari_origin_ss").attachTo(this.papet);
+      this.papet_ss.gotoAndPlay("idol");
+      this.papet_jump_ss = this.papet_ss;
+      this.papet_jump=this.papet;
+      this.papet_jump.flag=false;
+      var papet_jump = this.papet_jump;
+      this.papet.y = -45;
+      this.papet.x=-10;
+      this.finger_s = Sprite("tutorial_finger_s").addChildTo(this.objects[2]);
+      this.finger_s.alpha=0.8;
+      this.finger_s.x = 82;
+      this.finger_s.y= 32;
+      
+      this.finger = Sprite("tutorial_finger").addChildTo(this.objects[2]);
+      this.finger.x = 80;
+      this.finger.y= 30;
+      var finger3 = this.finger;
+      var finger_s3 = this.finger_s;
+      this.papet.tweener.clear().call(function(){
+        papet_jump.flag=true;
+        finger3.tweener.clear().set({x:80,y:30}).to({y:-10},100);
+        finger_s3.tweener.clear().set({x:82,y:32}).to({y:-8},100);
+      }).wait(2000).call(function(){
+        papet_jump.flag=false;
+        finger3.tweener.clear().set({x:85,y:-15}).wait(500).to({y:25},100).wait(500).set({x:80,y:30});
+        finger_s3.tweener.clear().set({x:85,y:-3}).wait(500).to({y:37},100).wait(500).set({x:82,y:32});
+      }).wait(2000).setLoop(true);
+      
+      this.papet = Sprite("yukari_origin").addChildTo(this.objects[3]);
+      this.papet.reverse=true;
+      this.papet.scale.set(0.5,0.5);
+      this.papet.origin.set(0,0);
+      this.papet_ss = FrameAnimation("yukari_origin_ss").attachTo(this.papet);
+      this.papet_ss.gotoAndPlay("idol");
+      this.papet_slash_ss = this.papet_ss;
+      this.papet_slash=this.papet;
+      this.papet_slash.flag=false;
+      var papet_slash = this.papet_slash;
+      var papet_slash_ss = this.papet_slash_ss;
+      this.papet.y = -45;
+      this.papet.x=-10;
+      this.finger_s = Sprite("tutorial_finger_s").addChildTo(this.objects[3]);
+      this.finger_s.alpha=0.8;
+      this.finger_s.x=82;
+      this.finger_s.y=-8;
+      this.finger = Sprite("tutorial_finger").addChildTo(this.objects[3]);
+      this.finger.x = 80;
+      this.finger.y=-10;
+      var finger4 = this.finger;
+      var finger_s4 = this.finger_s;
+      this.finger_s = Sprite("tutorial_finger_s").addChildTo(this.objects[3]);
+      this.finger_s.scaleX=-1;
+      this.finger_s.alpha=0.8;
+      this.finger_s.x=42;
+      this.finger_s.y=32;
+      this.finger = Sprite("tutorial_finger").addChildTo(this.objects[3]);
+      this.finger.scaleX=-1;
+      this.finger.x = 40;
+      this.finger.y=30;
+      var finger5 = this.finger;
+      var finger_s5=this.finger_s;
+      this.papet.tweener.clear().call(function(){
+        papet_slash.flag=true;
+        finger_s5.tweener.clear().set({x:42,y:32});
+        finger5.tweener.clear().set({x:40,y:30});
+      }).wait(2000).call(function(){
+        papet_slash.flag=false;
+        finger_s5.tweener.clear().set({x:47,y:37});
+        finger5.tweener.clear().set({x:45,y:25});
+      }).wait(1000).call(function(){
+        finger_s4.tweener.clear().set({x:82,y:-8}).to({y:32},100);
+        finger4.tweener.clear().set({x:80,y:-10}).to({y:30},100);
+        papet_slash_ss.gotoAndPlay("sitdown");
+        papet_slash.sitflag=true;
+      }).wait(1000).call(function(){
+        papet_slash.flag=true;
+        finger_s5.tweener.clear().set({x:42,y:32});
+        finger5.tweener.clear().set({x:40,y:30});
+      }).wait(2000).call(function(){
+        papet_slash.flag=false;
+        papet_slash.sitflag=false;
+        finger_s5.tweener.clear().set({x:47,y:37});
+        finger5.tweener.clear().set({x:45,y:25});
+        finger_s4.tweener.clear().set({x:87,y:37}).wait(500).to({y:-3},100).wait(500).set({x:82,y:-8});
+        finger4.tweener.clear().set({x:85,y:25}).wait(500).to({y:-15},100).wait(500).set({x:80,y:-10});
+      }).wait(2000).setLoop(true);
+      
       var self =this;
-      this.previouse.onpointend=function(){
-        if(this.getParent().visible){
-          if(0<this.getParent().Iterator)
-          this.getParent().Iterator--;
+      
+      this.previouse_t.setInteractive(true);
+      this.previouse_t.onpointend=function(){
+        if(this.visible){
+          if(0<this.getParent().Iterator){
+            this.getParent().Iterator--;
+            controlobj.cursorSE.play();
+          }
         }
       }
-      this.back.setInteractive(true);
-      this.back.onpointend = function(){
-        if(this.getParent().visible&&self.openflag){
+      this.back_t.setInteractive(true);
+      this.back_t.onpointend = function(){
+        if(this.visible&&self.openflag){
           this.getParent().enterflag=true;
         }
       }
-      this.next.setInteractive(true);
+      this.next_t.setInteractive(true);
       var length = this.objects.length;
-      this.next.onpointend=function(){
-        if(this.getParent().visible){
-          if(this.getParent().Iterator<length-1)
-          this.getParent().Iterator++;
+      this.next_t.onpointend=function(){
+        if(this.visible){
+          if(this.getParent().Iterator<length-1){
+            this.getParent().Iterator++;
+            controlobj.cursorSE.play();
+          }
         }
       }
       //this.title = Sprite(elements[0]).addChildTo(this.board);
@@ -454,23 +615,27 @@ phina.define("GameConsole",{
       this.previouse.setInteractive(true);
       var self =this;
       this.previouse.onpointend=function(){
-        if(this.getParent().visible){
-          if(0<this.getParent().Iterator)
-          this.getParent().Iterator--;
+        if(this.visible){
+          if(0<this.getParent().Iterator){
+            this.getParent().Iterator--;
+            controlobj.cursorSE.play();
+          }
         }
       }
       this.back.setInteractive(true);
       this.back.onpointend = function(){
-        if(this.getParent().visible&&self.openflag){
+        if(this.visible&&self.openflag){
           this.getParent().enterflag=true;
         }
       }
       this.next.setInteractive(true);
       var length = this.objects.length;
       this.next.onpointend=function(){
-        if(this.getParent().visible){
-          if(this.getParent().Iterator<length-1)
-          this.getParent().Iterator++;
+        if(this.visible){
+          if(this.getParent().Iterator<length-1){
+            controlobj.cursorSE.play();
+            this.getParent().Iterator++;
+          }
         }
       }
     }
@@ -719,6 +884,29 @@ phina.define("GameConsole",{
         },this);
       }
       if(this.openflag){
+        if(this.name=="tutorial"){
+          this.papet_jump.y=-45;
+          if(this.papet_jump.flag==true&&(this.papet_jump_ss.currentAnimation.self=="idol")){
+            this.papet_jump_ss.gotoAndPlay("jump");
+          }
+          if(this.papet_jump_ss.currentAnimation.self=="jump"){
+            var frame = this.papet_jump_ss.currentFrameIndex;
+            if(2<frame&&frame<18){
+              var JUMP_Y_ = 2.5*Math.pow(frame-9.5,2)-106;
+              //var JUMP_DY_ = JUMP_Y_-(2.5*Math.pow(frame-1-9.5,2)-106);
+              this.papet_jump.y = JUMP_Y_/FOUR/2-45;
+            }
+          }
+          if(this.papet_slash.sitflag==true&&(this.papet_slash_ss.currentAnimation.self=="idol")){
+            this.papet_slash_ss.gotoAndPlay("sitdown");
+          }
+          if(this.papet_slash.flag==true&&(this.papet_slash_ss.currentAnimation.self=="idol")){
+            this.papet_slash_ss.gotoAndPlay("slash");
+          }
+          if(this.papet_slash.flag==true&&(this.papet_slash_ss.currentAnimation.self=="sit")){
+            this.papet_slash_ss.gotoAndPlay("sslash");
+          }
+        }
         if(!phina.isMobile()){
           var flag;
           if((flag = keyboard.getKeyDown("z"))==true||keyboard.getKeyDown("right")){
@@ -734,6 +922,8 @@ phina.define("GameConsole",{
               this.pre_visible = false;
               this.board.x = -SCREEN_WIDTH;
               this.board.y = -SCREEN_HEIGHT;
+              if(this.name == "tutorial")
+                this.papet_jump.y=0;
             return this.parentname;
             }
           }
@@ -744,6 +934,8 @@ phina.define("GameConsole",{
             this.pre_visible = false;
             this.board.x = -SCREEN_WIDTH;
             this.board.y = -SCREEN_HEIGHT;
+            if(this.name == "tutorial")
+                this.papet_jump.y=0;
             return this.parentname;
           }
           else if(keyboard.getKeyDown("left")){
@@ -761,6 +953,8 @@ phina.define("GameConsole",{
           this.pre_visible = false;
           this.board.x = -SCREEN_WIDTH;
           this.board.y = -SCREEN_HEIGHT;
+          if(this.name == "tutorial")
+            this.papet_jump.y=0;
           return this.parentname;
         }
       }
@@ -769,16 +963,32 @@ phina.define("GameConsole",{
       });
       this.objects[this.board.Iterator].show();
       if(this.board.Iterator==0){
-        this.previouse.hide();
+        if(this.name == "tutorial"){
+          this.previouse_t.hide();
+        }
+        else {
+          this.previouse.hide();
+        }
       }
       else{
-        this.previouse.show();
+        if(this.name=="tutorial"){
+          this.previouse_t.show();
+        }
+        else{
+          this.previouse.show();
+        }
       }
       if(this.board.Iterator==this.objects.length-1){
-        this.next.hide();
+        if(this.name=="tutorial")
+          this.next_t.hide();
+        else
+          this.next.hide();
       }
       else{
-        this.next.show();
+        if(this.name=="tutorial")
+          this.next_t.show();
+        else
+          this.next.show();
       }
       this.pre_visible=this.parent.visible;
     }
@@ -836,10 +1046,12 @@ phina.define("GameConsole",{
             }
           }
           else if(this.dummy.upflag){
+            owner.cursorSE.play();
             this.dummy.upflag=false;
             this.up(y_offset);
           }
           else if(this.dummy.downflag){
+            owner.cursorSE.play();
             this.dummy.downflag=false;
             this.down(y_offset);
           }
@@ -1306,7 +1518,7 @@ phina.define("GameConsole",{
           case "yes":
             owner.cursorSE.play();
             owner.lobbyBGM.stop();
-            owner.exit();
+            owner.exit(owner.params);
             return this.name;
           case "no":
             owner.cancelSE.play();
@@ -2364,13 +2576,73 @@ phina.define("MainScene", {
     // super init
     this.superInit(options);
 
+    this.params={entries:[],win:0,lose:0,deuce:0,lastchara:"yukari"};
+    this.rounds=[];
+    /*var hit = 4;
+    var damage =10;
+    var scores =[];
+    var score = {text:"hit",point:hit};
+    scores.push(score);
+    score = {text:"yourHP",point:damage};
+    scores.push(score);
+    score = {text:"by a hair",point:1};
+    scores.push(score);
+    var round = {scores:scores};
+    this.rounds.push(round);
+    this.rounds.push(round);
+    this.rounds.push(round);
+    this.rounds.push(round);
+    var entry = {rounds: this.rounds};
+    this.params.entries.push(entry);
+    this.rounds=[];*/
     
-    this.gn = 3;
-    this.deuce = true;
+    this.gn = 2;
+    this.deuce = false;
     this.cpu_vs_cpu = false;
     
     this.se = 0.75;
     this.bgm = 0.75;
+    
+    this.SEpool = [];
+    this.cancelSE = AssetManager.get("sound","cancel");
+    this.SEpool.push(this.cancelSE);
+    this.chitSE = AssetManager.get("sound","chit");
+    this.SEpool.push(this.chitSE);
+    this.cursorSE = AssetManager.get("sound","cursor");
+    this.SEpool.push(this.cursorSE);
+    this.enterSE = AssetManager.get("sound","enter");
+    this.SEpool.push(this.enterSE);
+    this.fightSE = AssetManager.get("sound","fight");
+    this.SEpool.push(this.fightSE);
+    this.jhitSE = AssetManager.get("sound","jhit");
+    this.SEpool.push(this.jhitSE);
+    this.karaburiSE = AssetManager.get("sound","karaburi");
+    this.SEpool.push(this.karaburiSE);
+    this.sousaiSE = AssetManager.get("sound","sousai");
+    this.SEpool.push(this.sousaiSE);
+    this.readySE = AssetManager.get("sound","ready");
+    this.SEpool.push(this.readySE);
+    this.slashSE = AssetManager.get("sound","slash");
+    this.SEpool.push(this.slashSE);
+    this.todomeSE = AssetManager.get("sound","todome");
+    this.SEpool.push(this.todomeSE);
+    
+    this.SEpool.forEach(function(se){
+      se.volume=0.15*this.se;
+    },this);
+    
+    this.BGMpool=[];
+    this.lobbyBGM = AssetManager.get("sound","lobby");
+    this.BGMpool.push(this.lobbyBGM);
+    this.battleBGM = AssetManager.get("sound","battle");
+    this.BGMpool.push(this.battleBGM);
+    this.winJingle = AssetManager.get("sound","win");
+    this.BGMpool.push(this.winJingle);
+    this.loseJingle = AssetManager.get("sound","lose");
+    this.BGMpool.push(this.loseJingle);
+    this.BGMpool.forEach(function(bgm){
+      bgm.volume=0.2*this.bgm;
+    },this);
     
     // 背景
     this.bg = Sprite("bg25").addChildTo(this);
@@ -2429,13 +2701,13 @@ phina.define("MainScene", {
     this.clist2["entry"].parent.hide();
     
     this.clist_c={};
-    this.clist_c["root"] = GameConsole("root",null,["settings","credit","tutorial","exit"],this.m_center,120);
+    this.clist_c["root"] = GameConsole("root",null,["tutorial","settings","credit","exit"],this.m_center,120);
     this.clist_c["settings"] = GameConsole("settings","root",["settings_t","game_settings","sound_settings","back_s"],this.m_center);
     this.clist_c["game_settings"] = GameConsole("game_settings","settings",["game_settings_t","game_num","deuce","cpu_vs_cpu","back_s"],this.m_center,0,this);
     this.clist_c["sound_settings"] = GameConsole("sound_settings","settings",["sound_settings_t","se","bgm","back_s"],this.m_center,0,this);
     this.clist_c["exit"] = GameConsole("exit","root",["exit_message","yes","no"],this.m_center,0,this);
-    this.clist_c["credit"] = GameConsole("credit","root",[],this.m_center,0);
-    this.clist_c["tutorial"] = GameConsole("tutorial","root",[],this.m_center,0);
+    this.clist_c["credit"] = GameConsole("credit","root",[],this.m_center,0,this);
+    this.clist_c["tutorial"] = GameConsole("tutorial","root",[],this.m_center,0,this);
     this.clist_c["credit"].parent.hide();
     this.clist_c["tutorial"].parent.hide();
     this.clist_c["settings"].parent.hide();
@@ -2443,9 +2715,9 @@ phina.define("MainScene", {
     this.clist_c["sound_settings"].parent.hide();
     this.clist_c["exit"].parent.hide();
     
-    
     var clists = [this.clist1,this.clist_c,this.clist2];
     var pointflag=true;
+    var cursorSE = this.cursorSE;
     //this.pcflag=false;
     var conpstart = function(e){
       if(!clists[0]["entry"].parent.visible&&!clists[2]["entry"].parent.visible&&!clists[1]["settings"].parent.visible
@@ -2463,6 +2735,7 @@ phina.define("MainScene", {
               }
             });
           if(this.getParent().getParent().getParent().alpha==0.25&&pointflag){
+            cursorSE.play();
             this.getParent().getParent().getParent().tweener.clear().set({alpha: 0.26}).to({alpha: 1},200,"easeOutQuart");
             clists.forEach(function(clist){
               if(clist["root"].owner.alpha==1){
@@ -2601,46 +2874,7 @@ phina.define("MainScene", {
     this.karaburiflag1_e=false;
     this.karaburiflag2_e=false;
     
-    this.SEpool = [];
-    this.cancelSE = AssetManager.get("sound","cancel");
-    this.SEpool.push(this.cancelSE);
-    this.chitSE = AssetManager.get("sound","chit");
-    this.SEpool.push(this.chitSE);
-    this.cursorSE = AssetManager.get("sound","cursor");
-    this.SEpool.push(this.cursorSE);
-    this.enterSE = AssetManager.get("sound","enter");
-    this.SEpool.push(this.enterSE);
-    this.fightSE = AssetManager.get("sound","fight");
-    this.SEpool.push(this.fightSE);
-    this.jhitSE = AssetManager.get("sound","jhit");
-    this.SEpool.push(this.jhitSE);
-    this.karaburiSE = AssetManager.get("sound","karaburi");
-    this.SEpool.push(this.karaburiSE);
-    this.sousaiSE = AssetManager.get("sound","sousai");
-    this.SEpool.push(this.sousaiSE);
-    this.readySE = AssetManager.get("sound","ready");
-    this.SEpool.push(this.readySE);
-    this.slashSE = AssetManager.get("sound","slash");
-    this.SEpool.push(this.slashSE);
-    this.todomeSE = AssetManager.get("sound","todome");
-    this.SEpool.push(this.todomeSE);
     
-    this.SEpool.forEach(function(se){
-      se.volume=0.15*this.se;
-    },this);
-    
-    this.BGMpool=[];
-    this.lobbyBGM = AssetManager.get("sound","lobby");
-    this.BGMpool.push(this.lobbyBGM);
-    this.battleBGM = AssetManager.get("sound","battle");
-    this.BGMpool.push(this.battleBGM);
-    this.winJingle = AssetManager.get("sound","win");
-    this.BGMpool.push(this.winJingle);
-    this.loseJingle = AssetManager.get("sound","lose");
-    this.BGMpool.push(this.loseJingle);
-    this.BGMpool.forEach(function(bgm){
-      bgm.volume=0.2*this.bgm;
-    },this);
     this.lobbyBGM.loop=true;
     this.lobbyBGM.play();
     
@@ -2914,6 +3148,7 @@ phina.define("MainScene", {
             }
             if(this.deuce&&go.match&&go.target.roundpoint+1 >= this.gn){
               go.match = false;
+              this.params.deuce++;
             }
             if(this.deuce && go.target.match){
               this.winobj = go.target;
@@ -2934,9 +3169,36 @@ phina.define("MainScene", {
         
       },this).wait(1000).call(function(){
         this.roundlabel.text = gos[0].roundpoint+ " - " + gos[1].roundpoint;
-        console.log(gos[0].match,gos[0].roundpoint,gos[1].match,gos[1].roundpoint,this.gn);
+        //console.log(gos[0].match,gos[0].roundpoint,gos[1].match,gos[1].roundpoint,this.gn);
+        
+        var leftHP = this.controlobj.hitpoint;
+        var hit = 10-this.controlobj.target.hitpoint;
+        var scores=[];
+        scores.push({text: "hit",point:hit});
+        scores.push({text: "yourHP",point:leftHP});
+        if(leftHP == 10 && hit==10){
+          scores.push({text: "stealth",point:1});
+        }
+        if(leftHP == 1 && hit == 10){
+          scores.push({text: "by a hair",point:1});
+        }
+        var round = {scores:scores};
+        this.rounds.push(round);
+        //console.log(this.rounds);
+        
         if(this.gameset){
+          if(this.controlobj.object.name.match("yukari")){
+            this.params.lastchara = "yukari";
+          }
+          else if(this.controlobj.object.name.match("maki")){
+            this.params.lastchara = "maki";
+          }
+          var entry = {rounds: this.rounds};
+          this.params.entries.push(entry);
+          this.rounds=[];
+          //console.log(this.params);
           if(this.controlobj == this.winobj){
+            this.params.win++;
             this.battleBGM.stop();
             this.battleBGM.isplaying=false;
             this.winJingle.play();
@@ -2946,6 +3208,7 @@ phina.define("MainScene", {
             this.win.tweener.clear().set({y:40,x:SCREEN_WIDTH+100}).to({x:-this.win.width/2},2000,"easeOutInQuart").call(function(){this.win.hide();},this);
           }
           else{
+            this.params.lose++;
             this.battleBGM.stop();
             this.battleBGM.isplaying=false;
             this.loseJingle.play();
@@ -3086,102 +3349,186 @@ phina.define('myResultScene', {
   init: function(params) {
     params = ({}).$safe(params, phina.game.ResultScene.defaults);
     this.superInit(params);
-
+    
+    var chara="reslut_yukari";
+    
+    if(params.lastchara=="yukari"){
+      chara="result_yukari";
+    }
+    else if(params.lastchara == "maki"){
+      chara="result_maki";
+    }
+    
+    var sprite = Sprite(chara).addChildTo(this);
+    sprite.x=0;
+    sprite.y=12;
+    sprite.origin.set(0,0);
+    Label({originX:0,originY:0,y:-10,text:"Thank you for playing !",fontSize:20,fontFamily:"mypixel",fill:"#fff"}).addChildTo(this);
+    this.scoreclip = DisplayElement().addChildTo(this);
+    this.scoreclip.clip = function(canvas){
+      canvas.beginPath();
+      canvas.rect(80,20,160,80);
+    };
+    var ite =0;
+    this.allappear = false;
+    this.scoreboard = DisplayElement({originX:0,originY:0,x:80,y:20,width:160,height:80}).addChildTo(this.scoreclip);
+    this.scoreboard.setInteractive(true);
+    var self = this;
+    this.scoreboard.onpointmove = function(e){
+      if(self.allappear&&(this.y+e.pointer.deltaPosition.y>=-(this.height-80)+10&&this.y+e.pointer.deltaPosition.y<=20))
+        this.moveBy(0,e.pointer.deltaPosition.y);
+      else if(self.allappear&&this.y+e.pointer.deltaPosition.y<-(this.height-80)+10){
+        this.y=-(this.height-80)+10;
+      }
+      else if(self.allappear&&this.y+e.pointer.deltaPosition.y>20){
+        this.y=20;
+      }
+    };
+    this.results = [];
+    var total=0;
+    params.entries.forEach(function(entry,i){
+      this.results.push(Label({originX:0,originY:0,x:0,y:-10+ite*10,text:"entry " +(i+1),fill:"#fff",fontSize:16,fontFamily:"mypixel"}).addChildTo(this.scoreboard));
+      ite++;
+      entry.rounds.forEach(function(round,j){
+        this.results.push(Label({originX:0,originY:0,x:3,y:-10+ite*10,text:"round " +(j+1),fill:"#fff",fontSize:16,fontFamily:"mypixel"}).addChildTo(this.scoreboard));
+        ite++;
+        round.scores.forEach(function(score){
+          var color = "#fff";
+          if(score.text == "stealth" || score.text == "by a hair"){
+            color = "#faf";
+          }
+          var de = DisplayElement().addChildTo(this.scoreboard);
+          Label({originX:0,originY:0,x:6,y:-10+ite*10,text:score.text +":",fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+          Label({originX:1,originY:0,x:90,y:-10+ite*10,text:score.point,fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+          Label({originX:0,originY:0,x:75,y:-10+ite*10,text:"x",fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+          var point;
+          switch(score.text){
+            case "hit":
+              point = 100;
+              break;
+            case "yourHP":
+              point =10;
+              break;
+            case "by a hair":
+              point = 1000;
+              break;
+            case "stealth":
+              point = 2000;
+              break;
+          }
+          Label({originX:1,originY:0,x:130,y:-10+ite*10,text:point+"=",fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+          Label({originX:1,originY:0,x:160,y:-10+ite*10,text:score.point*point,fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+          total += score.point*point;
+          ite++;
+          this.results.push(de);
+        },this);
+      },this);
+    },this);
+    var color ="#fff";
+    var de = DisplayElement().addChildTo(this.scoreboard);
+    Label({originX:0,originY:0,x:3,y:-10+ite*10,text:"win:",fill:"#fff",fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+    Label({originX:1,originY:0,x:90,y:-10+ite*10,text:params.win,fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+    Label({originX:0,originY:0,x:75,y:-10+ite*10,text:"x",fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+    var point=1000;
+    Label({originX:1,originY:0,x:130,y:-10+ite*10,text:point+"=",fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+    Label({originX:1,originY:0,x:160,y:-10+ite*10,text:params.win*point,fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+    total += params.win*point;
+    ite++;
+    this.results.push(de);
+    de = DisplayElement().addChildTo(this.scoreboard);
+    Label({originX:0,originY:0,x:3,y:-10+ite*10,text:"lose:",fill:"#fff",fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+    Label({originX:1,originY:0,x:90,y:-10+ite*10,text:params.lose,fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+    Label({originX:0,originY:0,x:75,y:-10+ite*10,text:"x",fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+    var point=1;
+    Label({originX:1,originY:0,x:130,y:-10+ite*10,text:point+"=",fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+    Label({originX:1,originY:0,x:160,y:-10+ite*10,text:params.lose*point,fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+    total += params.lose*point;
+    ite++;
+    this.results.push(de);
+    de = DisplayElement().addChildTo(this.scoreboard);
+    Label({originX:0,originY:0,x:3,y:-10+ite*10,text:"deuce:",fill:"#fff",fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+    Label({originX:1,originY:0,x:90,y:-10+ite*10,text:params.deuce,fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+    Label({originX:0,originY:0,x:75,y:-10+ite*10,text:"x",fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+    var point=100;
+    Label({originX:1,originY:0,x:130,y:-10+ite*10,text:point+"=",fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+    Label({originX:1,originY:0,x:160,y:-10+ite*10,text:params.deuce*point,fill:color,fontSize:16,fontFamily:"mypixel"}).addChildTo(de);
+    total += params.deuce*point;
+    ite++;
+    this.results.push(de);
+    this.scoreboard.height = ite*10;
+    
+    this.results.forEach(function(de){
+      de.hide();
+    },this);
+    
+    this.totalscore = DisplayElement().addChildTo(this);
+    Label({originX:0,originY:0,x:100,y:85,text:"Total:",fill:color,fontSize:20,fontFamily:"mypixel"}).addChildTo(this.totalscore);
+    Label({originX:1,originY:0,x:240,y:85,text:total,fill:color,fontSize:20,fontFamily:"mypixel"}).addChildTo(this.totalscore);
+    this.totalscore.hide();
+    var resultappear =function(i){
+      self.results[i].show();
+      if(7<=i){
+        self.scoreboard.y-=10;
+      }
+      if(i<self.results.length-1){
+        self.results[i].tweener.clear().wait(100).call(resultappear,self,[i+1]);
+      }
+      else{
+        self.allappear=true;
+        self.totalscore.show();
+        self.b.show();
+      }
+    };
+    resultappear(0);
+    
     var message = params.message.format(params);
 
     this.backgroundColor = params.backgroundColor;
-
-    this.fromJSON({
-      children: {
-        scoreText: {
-          className: 'phina.display.Label',
-          arguments: {
-            text: 'score',
-            fill: params.fontColor,
-            stroke: null,
-            fontSize: 4,
-          },
-          x: this.gridX.span(8),
-          y: this.gridY.span(4),
-        },
-        scoreLabel: {
-          className: 'phina.display.Label',
-          arguments: {
-            text: params.score+'',
-            fill: params.fontColor,
-            stroke: null,
-            fontSize: 7,
-          },
-          x: this.gridX.span(8),
-          y: this.gridY.span(6),
-        },
-
-        messageLabel: {
-          className: 'phina.display.Label',
-          arguments: {
-            text: message,
-            fill: params.fontColor,
-            stroke: null,
-            fontSize: 3,
-          },
-          x: this.gridX.center(),
-          y: this.gridY.span(9),
-        },
-
-        shareButton: {
-          className: 'phina.ui.Button',
-          arguments: [{
-            text: '★',
-            width: 28,
-            height: 28,
-            fontColor: params.fontColor,
-            fontSize: 5,
-            cornerRadius: 6,
-            fill: 'rgba(240, 240, 240, 0.5)',
-            // stroke: '#aaa',
-            // strokeWidth: 2,
-          }],
-          x: this.gridX.center(-3),
-          y: this.gridY.span(12),
-        },
-        playButton: {
-          className: 'phina.ui.Button',
-          arguments: [{
-            text: '▶',
-            width: 28,
-            height: 28,
-            fontColor: params.fontColor,
-            fontSize: 5,
-            cornerRadius: 6,
-            fill: 'rgba(240, 240, 240, 0.5)',
-            // stroke: '#aaa',
-            // strokeWidth: 2,
-          }],
-          x: this.gridX.center(3),
-          y: this.gridY.span(12),
-
-          interactive: true,
-          onpush: function() {
-            this.exit();
-          }.bind(this),
-        },
+    this.b= DisplayElement().addChildTo(this);
+    this.b.hide();
+    this.tweetb = Button({
+      text: "Tweet",
+      width: 40,
+      height: 16,
+      fontColor: params.fontColor,
+      fontSize: 16,
+      cornerRadius: 6,
+      fontFamily:"mypixel",
+      fill: 'rgba(240, 240, 240, 0.5)',
+      // stroke: '#aaa',
+      // strokeWidth: 2,
+      x: 130,
+      y: 123,
+    }).addChildTo(this.b);
+    this.replayb = Button({
+      text: 'Replay',
+      width: 40,
+      height: 16,
+      fontColor: params.fontColor,
+      fontSize: 16,
+      cornerRadius: 6,
+      fontFamily:"mypixel",
+      fill: 'rgba(240, 240, 240, 0.5)',
+      x: 200,
+      y: 123,
+    }).addChildTo(this.b);
+    this.replayb.onpush = function() {
+      if(this.visible){
+        self.exit();
       }
-    });
+    };
+    
 
-    if (params.exitType === 'touch') {
-      this.on('pointend', function() {
-        this.exit();
-      });
-    }
-
-    this.shareButton.onclick = function() {
-      var text = 'Score: {0}\n{1}'.format(params.score, message);
-      var url = phina.social.Twitter.createURL({
-        text: text,
-        hashtags: params.hashtags,
-        url: params.url,
-      });
-      window.open(url, 'share window', 'width=480, height=320');
+    this.tweetb.onclick = function() {
+      if(this.visible){
+        var text = 'Total: {0}\n{1}'.format(total, message);
+        var url = phina.social.Twitter.createURL({
+          text: text,
+          hashtags: params.hashtags,
+          url: params.url,
+        });
+        window.open(url, 'share window', 'width=480, height=320');
+      }
     };
   },
 
@@ -3286,12 +3633,12 @@ phina.main(function() {
           nextLabel: "splash"
         }
       ],
-    startLabel: 'main',   // MainScene から開始
+    startLabel: 'splash',   // MainScene から開始
     width: SCREEN_WIDTH,  // 画面幅
     height: SCREEN_HEIGHT,// 画面高さ
     assets: ASSETS,       // アセット読み込み
   });
-  app.enableStats();
+  //app.enableStats();
   // 実行
   app.run();
 });</script>
