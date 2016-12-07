@@ -160,31 +160,7 @@ var ASSETS = {
 		"maki_origin_ss":"ss/maki25_master.json",
 	},
 	json: {
-	  hantei0: 'hantei/backstep/backstephantei.txt.json',
-	  hantei1: 'hantei/backwalk/backwalkhantei.txt.json',
-	  hantei2: 'hantei/counterdamage/counterdamagehantei.txt.json',
-	  hantei3: 'hantei/damage/damagehantei.txt.json',
-	  hantei4: 'hantei/dash/dashhantei.txt.json',
-	  hantei5: 'hantei/down/downhantei.txt.json',
-	  hantei6: 'hantei/idol/idolhantei.txt.json',
-	  hantei7: 'hantei/jdamage/jdamagehantei.txt.json',
-	  hantei8: 'hantei/jrslash/jrslashhantei.txt.json',
-	  hantei9: 'hantei/jslash/jslashhantei.txt.json',
-	  hantei10: 'hantei/jump/jumphantei.txt.json',
-	  hantei11: 'hantei/sdamage/sdamagehantei.txt.json',
-	  hantei12: 'hantei/shirimochi/shirimochihantei.txt.json',
-	  hantei13: 'hantei/sit/sithantei.txt.json',
-	  hantei14: 'hantei/slash1/slashhantei.txt.json',
-	  hantei15: 'hantei/sslash/sslashhantei.txt.json',
-	  hantei16: 'hantei/wakeup/wakeuphantei.txt.json',
-	  hantei17: 'hantei/walk/walkhantei.txt.json',
-	  hantei18: 'hantei/winpose/winposehantei.txt.json',
-	  hantei19: 'hantei/wintoidol/wintoidolhantei.txt.json',
-	  hantei20: 'hantei/backwalkbegin/backwalkbeginhantei.txt.json',
-	  hantei21: 'hantei/walkbegin/walkbeginhantei.txt.json',
-	  hantei22: 'hantei/standup/standuphantei.txt.json',
-	  hantei23: 'hantei/sitdown/sitdownhantei.txt.json',
-	  hantei24: 'hantei/jdamage_keep/jdamage_keephantei.txt.json',
+    hantei: 'hantei/hantei.json',
 	},
 	sound: {
 	  cancel: 'se/cancel.wav',
@@ -2859,14 +2835,7 @@ phina.define("MainScene", {
     this.lose.hide();
     this.decolate.hide();
     
-    this.hanteilist = [];
-    var _hanteis = ["hantei0","hantei1","hantei2","hantei3","hantei4","hantei5","hantei6","hantei7","hantei8","hantei9","hantei10","hantei11","hantei12","hantei13","hantei14","hantei15","hantei16","hantei17","hantei18","hantei19"
-    ,"hantei20","hantei21","hantei22","hantei23","hantei24"
-    ];
-    (_hanteis.length).times(function(i){
-      var tmp = AssetManager.get("json",_hanteis[i]);
-      this.hanteilist.push(tmp.data);
-    },this);
+    this.hanteilist = AssetManager.get("json","hantei").data;
     this.hanteipool=[];
     
     this.karaburiflag1_p=false;
