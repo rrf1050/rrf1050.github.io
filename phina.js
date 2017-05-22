@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * phina.js 0.2.0
  * phina.js is a game library in javascript
  * MIT Licensed
@@ -11477,6 +11477,7 @@ phina.namespace(function() {
           this.context.imageSmoothingEnabled = v;
           this.context.webkitImageSmoothingEnabled = v;
           this.context.mozImageSmoothingEnabled = v;
+	  this.context.msImageSmoothingEnabled=v;
         }
       },
     },
